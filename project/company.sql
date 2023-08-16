@@ -1,13 +1,13 @@
-----------------------------------------
--- FILE TO IMPORT INTO PHPMYADMIN !!! --
-----------------------------------------
+--------------------------------------
+-- FILE TO IMPORT TO PHPMYADMIN !!! --
+--------------------------------------
 
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 16, 2023 at 04:12 PM
+-- Generation Time: Aug 16, 2023 at 11:38 PM
 -- Wersja serwera: 10.4.28-MariaDB
 -- Wersja PHP: 8.2.4
 
@@ -28,6 +28,20 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Struktura tabeli dla tabeli `clientdb`
+--
+
+CREATE TABLE `clientdb` (
+  `id` int(11) NOT NULL,
+  `pesel` varchar(11) NOT NULL,
+  `client_id` int(12) DEFAULT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Struktura tabeli dla tabeli `reports`
 --
 
@@ -35,9 +49,7 @@ CREATE TABLE `reports` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `topic` varchar(30) NOT NULL,
-  `client_id` int(12) NOT NULL,
-  `email` varchar(50) NOT NULL,
-  `description` varchar(1024) NOT NULL
+  `description` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -59,12 +71,18 @@ CREATE TABLE `users` (
 --
 
 --
+-- Indeksy dla tabeli `clientdb`
+--
+ALTER TABLE `clientdb`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `client_id` (`client_id`);
+
+--
 -- Indeksy dla tabeli `reports`
 --
 ALTER TABLE `reports`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `foreign key` (`client_id`),
-  ADD KEY `user_id key` (`user_id`);
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indeksy dla tabeli `users`
@@ -77,26 +95,38 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `clientdb`
+--
+ALTER TABLE `clientdb`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `reports`
 --
 ALTER TABLE `reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
 --
 
 --
+-- Constraints for table `clientdb`
+--
+ALTER TABLE `clientdb`
+  ADD CONSTRAINT `clientdb_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `reports`
 --
 ALTER TABLE `reports`
-  ADD CONSTRAINT `user_id key` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `reports_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

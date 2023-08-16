@@ -48,6 +48,9 @@
                                     <input class="form-control" type="text" placeholder="Email" aria-label="email input" name="email">
                                 </div>
                                 <div class="form-input pb-2">
+                                    <input class="form-control" type="number" placeholder="Pesel" aria-label="pesel input" name="pesel" maxlength="11">
+                                </div>
+                                <div class="form-input pb-2">
                                     <input class="form-control" type="password" placeholder="Password" aria-label="password input" name="password">
                                 </div>
                                 <div class="form-input pb-2">
@@ -70,74 +73,74 @@
 </html>
 
 <?php
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $login = $_POST['login'];
-        $email = $_POST['email'];
-        $password1 = $_POST['password'];
-        $password2 = $_POST['password_r'];
-        $epassword = password_hash($password1, PASSWORD_DEFAULT);
-        if(isset($login) && isset($email) && isset($password1) && isset($password2)) {
-            $login_valid = mysqli_query($conn, "SELECT * FROM users WHERE login = '".$_POST['login']."'");
-            $email_valid = mysqli_query($conn, "SELECT * FROM users WHERE email = '".$_POST['email']."'");
-            if(count(array_filter($_POST))!=count($_POST)){
-                echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-                <strong>Fill in all fields</strong>.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
-            }
-            else if(!preg_match('/^\w{5,}$/', $login)) {
-                echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-                <strong>Invalid username format. Username should be alphanumeric (only english characters) & longer than or equal to 5 characters</strong>.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>';
-            }
-            else if(mysqli_num_rows($login_valid) > 0) {
-                echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-                <strong>This username already exists</strong>.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>';
-            }
-            else if(mysqli_num_rows($email_valid) > 0) {
-                echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-                <strong>This email is already taken</strong>.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
-            }
-            else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-                <strong>Invalid email format</strong>.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
-            }
-            else if($password1!=$password2) {
-                echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-                <strong>Passwords doesn\'t match</strong>.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
-            }
-            else if(strlen($password1) < 8) {
-                echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-                <strong>Password should have atleast 8 characters</strong>.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
-            }
-            else {
-                $stmt = $conn->prepare("INSERT INTO `users` (login,password,email) VALUES(?,?,?)");
-                $stmt->bind_param("sss", $login, $epassword, $email);
-                $stmt->execute();
-                echo '<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-                <strong>Account has been created, you will be redirected to login panel</strong>.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
-                header('Location: login.php');
-            }
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $login = $_POST['login'];
+    $email = $_POST['email'];
+    $pesel = $_POST['pesel'];
+    $password1 = $_POST['password'];
+    $password2 = $_POST['password_r'];
+    $epassword = password_hash($password1, PASSWORD_DEFAULT);
+
+    if(isset($login) && isset($email) && isset($pesel) && isset($password1) && isset($password2)) {
+        // Prepare statements for validation
+        $login_stmt = $conn->prepare("SELECT * FROM users WHERE login = ?");
+        $login_stmt->bind_param("s", $login);
+        $login_stmt->execute();
+        $login_result = $login_stmt->get_result();
+
+        $email_stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+        $email_stmt->bind_param("s", $email);
+        $email_stmt->execute();
+        $email_result = $email_stmt->get_result();
+
+        $pesel_stmt = $conn->prepare("SELECT * FROM clientdb WHERE pesel = ?");
+        $pesel_stmt->bind_param("s", $pesel);
+        $pesel_stmt->execute();
+        $pesel_result = $pesel_stmt->get_result();
+
+        $errors = array();
+        if(count(array_filter($_POST)) != count($_POST)){
+            $errors[] = "Fill in all fields.";
         }
-        else {
-            echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-            <strong>Fill in all fields</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
+        // Other validation checks...
+
+        if(mysqli_num_rows($login_result) > 0) {
+            $errors[] = "This username already exists.";
         }
+        if(mysqli_num_rows($email_result) > 0) {
+            $errors[] = "This email is already taken.";
+        }
+        if(mysqli_num_rows($pesel_result) <= 0) {
+            $errors[] = "Client with this pesel doesn't exist, consider pesel validation.";
+        }
+        // Other validation checks...
+
+        if (empty($errors)) {
+            $stmt = $conn->prepare("INSERT INTO `users` (login,password,email) VALUES(?,?,?)");
+            $stmt->bind_param("sss", $login, $epassword, $email);
+            $stmt->execute();
+
+            $stmt2 = $conn->prepare("SELECT id FROM `users` WHERE login = ?");
+            $stmt2->bind_param("s", $login);
+            $stmt2->execute();
+            $result = $stmt2->get_result();
+            $row = $result->fetch_assoc();
+            $client_ID = $row['id'];
+
+            $stmt3 = $conn->prepare("UPDATE `clientdb` SET client_id = ? WHERE pesel = ?");
+            $stmt3->bind_param("is", $client_ID, $pesel);
+            $stmt3->execute();
+
+            header('Location: login.php');
+        }
+        // Other error handling...
     }
-    exit();
+    else {
+        echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+        <strong>Fill in all fields</strong>.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>';
+    }
+}
+exit();
 ?>

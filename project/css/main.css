@@ -66,3 +66,12 @@ a {
     color:#32189e !important;
     font-weight: 500 !important;
 }
+
+.alert-fixed {
+    position:fixed !important; 
+    top: 100px !important; 
+    left: 0px !important; 
+    width: 100% !important;
+    z-index:9999 !important; 
+    border-radius:0px !important;
+}

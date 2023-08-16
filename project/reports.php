@@ -78,7 +78,7 @@
                             <form class="card px-5 py-5" action="reports.php" method="POST" id="reports">
                                 <h3 class="mb-2 font-weight-bold text-center pb-4">Submit a ticket</h3>
                                 <div class="form-input pb-2">
-                                    <select class="form-select" aria-label="form-select" name="topic">
+                                    <select class="form-select form-control" aria-label="form-select" name="topic">
                                         <option selected>Topic</option>
                                         <option value="Questions">Questions</option>
                                         <option value="Technical Issues">Technical Issues</option>
@@ -86,12 +86,6 @@
                                         <option value="Refunds">Refunds</option>
                                         <option value="Other">Other</option>
                                     </select>
-                                </div>
-                                <div class="form-input pb-2">
-                                    <input class="form-control" type="text" placeholder="Client ID" aria-label="client id input" name="client_id">
-                                </div>
-                                <div class="form-input pb-2" style="padding-bottom: 1.5rem !important">
-                                    <input class="form-control" type="text" placeholder="Email" aria-label="email input" name="email">
                                 </div>
                                 <div class="form-group">
                                     <label for="reports" style="padding-bottom: 0.25rem !important">Description of the problem</label>
@@ -115,57 +109,48 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $topic = $_POST['topic'];
-    $client_id = $_POST['client_id'];
-    $email = $_POST['email'];
     $description = $_POST['description'];
-    if(isset($topic) && isset($client_id) && isset($email) && isset($description)) {
-        if(count(array_filter($_POST))!=count($_POST)){
-            echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-            <strong>Fill in all fields</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
+
+    if (isset($topic) && isset($description)) {
+        $errors = array();
+
+        if (empty($topic) || $topic == "Topic") {
+            $errors[] = "Invalid topic.";
         }
-        elseif($topic == "Topic") {
-            echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-            <strong>Invalid topic.</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
+
+        if (strlen($description) < 20) {
+            $errors[] = "Description is too short, give more details.";
         }
-        elseif(!ctype_digit($client_id) || strlen($client_id) < 8) {
-            echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-            <strong>The Client ID should be a number and have at least 8 digits</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
-        }
-        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-            <strong>Invalid email format</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
-        }
-        elseif(strlen($description) < 20) {
-            echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-            <strong>Description is too short, give more details</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
-        }
-        else {
-            $stmt = $conn->prepare("INSERT INTO `reports` (user_id,topic,client_id,email,description) VALUES(?,?,?,?,?)");
-            $stmt->bind_param("isiss", $_SESSION['user_id'], $topic, $client_id, $email, $description);
+
+        if (empty($errors)) {
+
+            $stmt = $conn->prepare("INSERT INTO `reports` (user_id, topic, description) VALUES (?, ?, ?)");
+            $stmt->bind_param("iss", $_SESSION['user_id'], $topic, $description);
             $stmt->execute();
-            echo '<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+
+            echo '<div class="alert alert-fixed alert-success alert-dismissible fade show text-center" role="alert">
             <strong>Ticket has been created. Our team will handle it.</strong>.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>';
+        } else {
+            // Display error messages
+            foreach ($errors as $error) {
+                echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
+                <strong>' . $error . '</strong>.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>';
+            }
         }
-    }
+    } 
+
     else {
-        echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-        <strong>Fill in all fields</strong>.
+        echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
+        <strong>Fill in all required fields</strong>.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>';
     }
-}
+
 exit();
+}
 ?>
 
