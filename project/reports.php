@@ -3,10 +3,10 @@
   require_once "config.php";
 
   if(!isset($_SESSION['username'])){
-    header('Location: index.php');
+    header('Location: login.php');
   }
   
-  if($_SESSION['staff'] == True) {
+  if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
     header('Location: dashboard.php');
   }
 ?>

@@ -30,6 +30,11 @@
 </head>
   <body>
     <div class="container-fluid">
+      <a href="javascript:history.back()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-arrow-left m-3 mt-4 text-p" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+      </svg>
+      </a>
       <div class="row g-0">
           <div class="col-md-12">
               <div class="login d-flex align-items-center py-5">
@@ -52,8 +57,8 @@
                                     <div class="text-center">
                                         <button class="btn btn-primary mt-4 signup" type="submit" style="width: 150px;">Login</button>
                                     </div>
-                                    <div class="text-center mt-4"> <span>Don't have an account yet?</span> <a href="register.php" class="text-decoration-none">Register</a> </div>
-                                    <div class="text-center mt-4"><a href="#">Forget password?</a></div>
+                                    <div class="text-center mt-4"> <span>Don't have an account yet?</span> <a href="register.php" class="text-decoration-none text-p">Register</a> </div>
+                                    <div class="text-center mt-4"><a href="#" class="text-p">Forgot password?</a></div>
                                   </div>
                               </form>
                           </div>

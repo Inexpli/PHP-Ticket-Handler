@@ -60,11 +60,11 @@
 
       <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
         <li><a class="nav-link px-2 link-secondary">Home</a></li>
-        <li><a href="#" class="nav-link px-2">Features</a></li>
-        <li><a href="#" class="nav-link px-2">Pricing</a></li>
-        <li><a href="#" class="nav-link px-2">FAQs</a></li>
-        <li><a href="reports.php" class="nav-link px-2">Reports</a></li>
-        <li><a href="#" class="nav-link px-2">About</a></li>
+        <li><a href="#" class="nav-link px-2 text-p">Features</a></li>
+        <li><a href="#" class="nav-link px-2 text-p">Pricing</a></li>
+        <li><a href="#" class="nav-link px-2 text-p">FAQs</a></li>
+        <li><a href="reports.php" class="nav-link px-2 text-p">Reports</a></li>
+        <li><a href="#" class="nav-link px-2 text-p">About</a></li>
       </ul>
 
       <div class="col-md-3 text-end">
