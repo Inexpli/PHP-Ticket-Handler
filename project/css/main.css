@@ -75,3 +75,12 @@ a {
     z-index:9999 !important; 
     border-radius:0px !important;
 }
+
+header {
+    border-bottom: 1px solid rgb(214, 214, 214);
+}
+
+.container {
+    border-left: 1px solid rgb(214, 214, 214);
+    border-right: 1px solid rgb(214, 214, 214);
+}
