@@ -84,3 +84,15 @@ header {
     border-left: 1px solid rgb(214, 214, 214);
     border-right: 1px solid rgb(214, 214, 214);
 }
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

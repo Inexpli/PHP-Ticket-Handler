@@ -1,13 +1,15 @@
 <?php
     session_start();
-    require_once "config.php";
 
+    define('__ROOT__', dirname(dirname(__FILE__)));
+    require_once(__ROOT__.'\project\config.php');
+  
     if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
-        header('Location: dashboard.php');
+      header('Location: dashboard.php');
     }
-
+  
     if(isset($_SESSION['username'])){
-        header('Location: home.php');
+      header('Location: home.php');
     }
 ?>
 
@@ -25,6 +27,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" rel="stylesheet">
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   </head>
 <body>
 <div class="container-fluid">
@@ -48,7 +52,7 @@
                                     <input class="form-control" type="text" placeholder="Email" aria-label="email input" name="email">
                                 </div>
                                 <div class="form-input pb-2">
-                                    <input class="form-control" type="number" placeholder="Pesel" aria-label="pesel input" name="pesel" maxlength="11">
+                                    <input class="form-control" type="number" placeholder="Pesel" aria-label="pesel input" name="pesel" maxlength="11" id="pesel">
                                 </div>
                                 <div class="form-input pb-2">
                                     <input class="form-control" type="password" placeholder="Password" aria-label="password input" name="password">
@@ -71,6 +75,14 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<script>
+$('#pesel').keydown(function(e) {
+    if (this.value.length > 10) 
+        if ( !(e.which == '46' || e.which == '8' || e.which == '13') ) // backspace/enter/del
+            e.preventDefault();
+});
+</script>
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -100,18 +112,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $errors = array();
         if(count(array_filter($_POST)) != count($_POST)){
-            $errors[] = "Fill in all fields.";
+            $errors[] = "• Fill in all fields";
         }
         // Other validation checks...
 
         if(mysqli_num_rows($login_result) > 0) {
-            $errors[] = "This username already exists.";
+            $errors[] = "• This username already exists";
         }
         if(mysqli_num_rows($email_result) > 0) {
-            $errors[] = "This email is already taken.";
+            $errors[] = "• This email is already taken";
         }
         if(mysqli_num_rows($pesel_result) <= 0) {
-            $errors[] = "Client with this pesel doesn't exist, consider pesel validation.";
+            $errors[] = "• Client with this pesel doesn't exist, consider pesel validation";
         }
         // Other validation checks...
 
@@ -133,7 +145,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             header('Location: login.php');
         }
-        // Other error handling...
+        else {
+            echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">';
+            echo '<strong>Error(s):</strong><br>';
+            foreach ($errors as $error) {
+                echo $error . '<br>';
+            }
+            echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+            echo '</div>';
+        }
     }
     else {
         echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">

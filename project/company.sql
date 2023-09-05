@@ -1,6 +1,3 @@
---------------------------------------
--- FILE TO IMPORT TO PHPMYADMIN !!! --
---------------------------------------
 
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
