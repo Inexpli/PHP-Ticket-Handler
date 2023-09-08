@@ -33,6 +33,13 @@
   --bs-btn-disabled-border-color: #4723D9 !important;
 }
 
+.btn-ticket {
+    min-width: 80px !important;
+}
+
+@media only screen and (max-width: 992px) {
+    
+}
 </style>
 
 <!DOCTYPE html>
@@ -74,9 +81,9 @@
             <div class="login d-flex align-items-center py-5">
                 <div class="container mt-5 mb-5">
                     <div class="row d-flex align-items-center justify-content-center">
-                        <div class="col-12 col-md-8 col-lg-6 col-xl-6">
-                            <form class="card px-5 py-5" action="reports.php" method="POST" id="reports">
-                                <h3 class="mb-2 font-weight-bold text-center pb-4">Submit a ticket</h3>
+                        <div class="col-12 col-md-8 col-lg-8 col-xl-8">
+                            <form class="card px-4 px-sm-4 px-md-5 py-4 py-sm-4 py-md-5" action="reports.php" method="POST" id="reports">
+                                <h3 class="mb-2 font-weight-bold text-center pb-2 pb-md-4">Submit a ticket</h3>
                                 <div class="form-input pb-2">
                                     <select class="form-select form-control" aria-label="form-select" name="topic">
                                         <option selected>Topic</option>
@@ -88,13 +95,46 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="reports" style="padding-bottom: 0.25rem !important">Description of the problem</label>
+                                    <label for="reports" style="padding-bottom: 0.25rem !important">Description</label>
                                     <textarea class="form-control" id="reports_textarea" rows="8" name="description"></textarea>
                                 </div>
                                 <div class="text-center">
                                     <button class="btn btn-primary mt-4 signup" type="submit" style="width: 150px;">Submit</button>
                                 </div>
                             </form>
+                            <?php
+                                $stmt = $conn->prepare("SELECT * FROM `reports` WHERE user_id = ?");
+                                $stmt->bind_param("i", $_SESSION['user_id']);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+
+                                while ($row = $result->fetch_assoc()) {
+                                    $topic = $row['topic'];
+                                    $status = $row['status'];
+                                    if($status == True) {
+                                        $status = "Open";
+                                    }
+                                    else {
+                                        $status = "Closed";
+                                    }
+                                    $last_updated = date("d.m.Y, H:i", strtotime($row['last_updated']));
+                                    echo('
+                                        <div class="ticket card">
+                                            <div class="row">
+                                                <div class="col-2 col-lg-4">
+                                                    <button class="btn btn-primary btn-ticket">' . $status . '</button>
+                                                </div>
+                                                <div class="col-5 col-lg-4" style="padding-top: 6px; text-align: center;">
+                                                    ' . $topic . '
+                                                </div>
+                                                <div class="col-5 col-lg-4 resp-text" style="padding-top: 6px; text-align: end; word-spacing: 0.10rem; padding-right: 20px;">
+                                                    ' . $last_updated . '
+                                                </div>
+                                            </div>
+                                        </div>'
+                                    );
+                                }
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -107,50 +147,50 @@
 </html>
 
 <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $topic = $_POST['topic'];
     $description = $_POST['description'];
-
     if (isset($topic) && isset($description)) {
-        $errors = array();
+            $errors = array();
 
-        if (empty($topic) || $topic == "Topic") {
-            $errors[] = "Invalid topic.";
-        }
+            if (empty($topic) || $topic == "Topic") {
+                $errors[] = "Invalid topic.";
+            }
 
-        if (strlen($description) < 20) {
-            $errors[] = "Description is too short, give more details.";
-        }
+            if (strlen($description) < 20) {
+                $errors[] = "Description is too short, give more details.";
+            }
 
-        if (empty($errors)) {
+            if (empty($errors)) {
 
-            $stmt = $conn->prepare("INSERT INTO `reports` (user_id, topic, description) VALUES (?, ?, ?)");
-            $stmt->bind_param("iss", $_SESSION['user_id'], $topic, $description);
-            $stmt->execute();
+                date_default_timezone_set('Europe/Warsaw');
 
-            echo '<div class="alert alert-fixed alert-success alert-dismissible fade show text-center" role="alert">
-            <strong>Ticket has been created. Our team will handle it.</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
-        } else {
-            // Display error messages
-            foreach ($errors as $error) {
-                echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
-                <strong>' . $error . '</strong>.
+                $stmt = $conn->prepare("INSERT INTO `reports` (user_id, topic, description, status, created, last_updated) VALUES (?, ?, ?, 1, date('d-m-Y, H:i'), date('d-m-Y, H:i'))");
+                $stmt->bind_param("iss", $_SESSION['user_id'], $topic, $description);
+                $stmt->execute();
+
+                echo '<div class="alert alert-fixed alert-success alert-dismissible fade show text-center" role="alert">
+                <strong>Ticket has been created. Our team will handle it.</strong>.
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>';
+            } else {
+                // Display error messages
+                foreach ($errors as $error) {
+                    echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
+                    <strong>' . $error . '</strong>.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>';
+                }
             }
+        } 
+
+        else {
+            echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
+            <strong>Fill in all required fields</strong>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>';
         }
-    } 
 
-    else {
-        echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
-        <strong>Fill in all required fields</strong>.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-    }
-
-exit();
+    exit();
 }
 ?>
-

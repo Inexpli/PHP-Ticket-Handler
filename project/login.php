@@ -1,16 +1,56 @@
 <?php
-  session_start();
+session_start();
 
-  define('__ROOT__', dirname(dirname(__FILE__)));
-  require_once(__ROOT__.'\project\config.php');
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'\project\config.php');
 
-  if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
-    header('Location: dashboard.php');
+if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
+  header('Location: dashboard.php');
+}
+
+if(isset($_SESSION['username'])){
+  header('Location: home.php');
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  $login = $_POST['login'];
+  $password = $_POST['password'];
+  
+  if (empty($login) || empty($password)) {
+    echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+      <strong>Fill in empty fields</strong>.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>';
+    exit();
   }
 
-  if(isset($_SESSION['username'])){
-    header('Location: home.php');
+  $stmt = $conn->prepare("SELECT id, password, is_staff FROM `users` WHERE login = ?");
+  $stmt->bind_param("s", $login);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  while ($row = $result->fetch_assoc()) {
+    if (password_verify($password, $row['password'])) {
+      $_SESSION['username'] = $login;
+      $_SESSION['user_id'] = $row['id'];
+
+      if ($row['is_staff'] == 1) {
+        $_SESSION['staff'] = True;
+        header('Location: dashboard.php');
+      } 
+      else {
+        $_SESSION['staff'] = False;
+        header('Location: home.php');
+      }
+    } else {
+      echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+        <strong>Incorrect email or password</strong>.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>';
+    }
   }
+  exit();
+}
 ?>
 
 <!doctype html>
@@ -71,44 +111,3 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
-<?php
-  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $login = $_POST['login'];
-    $password = $_POST['password'];
-    
-    if (empty($login) || empty($password)) {
-      echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-        <strong>Fill in empty fields</strong>.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-      exit();
-    }
-  
-    $stmt = $conn->prepare("SELECT id, password, is_staff FROM `users` WHERE login = ?");
-    $stmt->bind_param("s", $login);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    while ($row = $result->fetch_assoc()) {
-      if (password_verify($password, $row['password'])) {
-        $_SESSION['username'] = $login;
-        $_SESSION['user_id'] = $row['id'];
-
-        if ($row['is_staff'] == 1) {
-          $_SESSION['staff'] = True;
-          header('Location: dashboard.php');
-        } 
-        else {
-          $_SESSION['staff'] = False;
-          header('Location: home.php');
-        }
-      } else {
-        echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-          <strong>Incorrect email or password</strong>.
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>';
-      }
-    }
-  }
-  exit();
-?>
