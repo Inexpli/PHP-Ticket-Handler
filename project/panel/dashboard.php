@@ -2,14 +2,14 @@
   session_start();
 
   define('__ROOT__', dirname(dirname(__FILE__)));
-  require_once(__ROOT__.'\project\config.php');
+  require_once(__ROOT__.'\config.php');
 
   if(!isset($_SESSION['username'])){
-    header('Location: login.php');
+    header('Location: ../login.php');
   }
 
   if($_SESSION['staff'] == False) {
-    header('Location: home.php');
+    header('Location: ../home.php');
   }
 ?>
 
@@ -56,72 +56,6 @@
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");:root{--header-height: 3rem;--nav-width: 68px;--first-color: #4723D9;--first-color-light: #AFA5D9;--white-color: #F7F6FB;--body-font: 'Nunito', sans-serif;--normal-font-size: 1rem;--z-fixed: 100}*,::before,::after{box-sizing: border-box}body{position: relative;margin: var(--header-height) 0 0 0;padding: 0 1rem;font-family: var(--body-font);font-size: var(--normal-font-size);transition: .5s}a{text-decoration: none}.header{width: 100%;height: var(--header-height);position: fixed;top: 0;left: 0;display: flex;align-items: center;justify-content: space-between;padding: 0 1rem;background-color: var(--white-color);z-index: var(--z-fixed);transition: .5s}.header_toggle{color: var(--first-color);font-size: 1.5rem;cursor: pointer}.header_img{width: 35px;height: 35px;display: flex;justify-content: center;border-radius: 50%;overflow: hidden}.header_img img{width: 40px}.l-navbar{position: fixed;top: 0;left: -30%;width: var(--nav-width);height: 100vh;background-color: var(--first-color);padding: .5rem 1rem 0 0;transition: .5s;z-index: var(--z-fixed)}.nav{height: 100%;display: flex;flex-direction: column;justify-content: space-between;overflow: hidden}.nav_logo, .nav_link{display: grid;grid-template-columns: max-content max-content;align-items: center;column-gap: 1rem;padding: .5rem 0 .5rem 1.5rem}.nav_logo{margin-bottom: 2rem}.nav_logo-icon{font-size: 1.25rem;color: var(--white-color)}.nav_logo-name{color: var(--white-color);font-weight: 700}.nav_link{position: relative;color: var(--first-color-light);margin-bottom: 1.5rem;transition: .3s}.nav_link:hover{color: var(--white-color)}.nav_icon{font-size: 1.25rem}.show{left: 0}.body-pd{padding-left: calc(var(--nav-width) + 1rem)}.active{color: var(--white-color)}.active::before{content: '';position: absolute;left: 0;width: 2px;height: 32px;background-color: var(--white-color)}.height-100{height:100vh}@media screen and (min-width: 768px){body{margin: calc(var(--header-height) + 1rem) 0 0 0;padding-left: calc(var(--nav-width) + 2rem)}.header{height: calc(var(--header-height) + 1rem);padding: 0 2rem 0 calc(var(--nav-width) + 2rem)}.header_img{width: 40px;height: 40px}.header_img img{width: 45px}.l-navbar{left: 0;padding: 1rem 1rem 0 0}.show{width: calc(var(--nav-width) + 156px)}.body-pd{padding-left: calc(var(--nav-width) + 188px)}}
-
-a {
-    text-decoration: none !important;
-}
-
-.btn-primary {
-    --bs-btn-color: #fff !important;
-    --bs-btn-bg: #4723D9 !important;
-    --bs-btn-border-color: #4723D9 !important; 
-    --bs-btn-hover-color: #fff !important;
-    --bs-btn-hover-bg: #32189e !important;
-    --bs-btn-hover-border-color: #32189e !important;
-    --bs-btn-focus-shadow-rgb: 49,132,253 !important;
-    --bs-btn-active-color: #fff !important;
-    --bs-btn-active-bg: #32189e !important;
-    --bs-btn-active-border-color: #32189e !important;
-    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important;
-    --bs-btn-disabled-color: #fff !important;
-    --bs-btn-disabled-bg: #4723D9 !important;
-    --bs-btn-disabled-border-color: #4723D9 !important;
-}
-
-.btn-outline-primary {
-    --bs-btn-color: #4723D9 !important;
-    --bs-btn-border-color: #4723D9 !important;
-    --bs-btn-hover-color: #fff !important;
-    --bs-btn-hover-bg: #4723D9 !important;
-    --bs-btn-hover-border-color: #4723D9 !important;
-    --bs-btn-focus-shadow-rgb: 13,110,253 !important;
-    --bs-btn-active-color: #fff !important;
-    --bs-btn-active-bg: #4723D9 !important;
-    --bs-btn-active-border-color: #4723D9 !important;
-    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important;
-    --bs-btn-disabled-color: #4723D9 !important;
-    --bs-btn-disabled-bg: transparent !important;
-    --bs-btn-disabled-border-color: #4723D9 !important;
-    --bs-gradient: none !important;
-}
-
-.form-control:focus {
-    border-color: rgba(71, 35, 217, 0.8) !important;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(71, 35, 217, 0.4) !important;
-    outline: 0 none !important;
-}
-
-.text-p {
-    color: #4723D9 !important;
-    font-weight: 500 !important; 
-}
-
-.text-p:hover {
-    color:#32189e !important;
-    font-weight: 500 !important;
-}
-
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
-}
 </style>
 
 <!DOCTYPE html>
@@ -129,14 +63,14 @@ input[type=number] {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="js/script.js"></script>
     <title>Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/dashboard.css">
     <!-- Bootstrap Icons CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" rel="stylesheet">
 </head>
 <body id="body-pd" style="background-color: #212529;">
     <header class="header bg-dark" id="header">
@@ -144,9 +78,9 @@ input[type=number] {
     </header>
     <div class="l-navbar" id="nav-bar">
         <nav class="nav">
-            <div> <a href="#" class="nav_logo"> <i class='bx bx-grid-alt nav_logo-icon'></i> <span class="nav_logo-name">Dashboard</span> </a>
-                <div class="nav_list"><a href="clients.php" class="nav_link" id="users"> <i class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a href="#" class="nav_link"> <i class='bx bx-message-square-detail nav_icon'></i> <span class="nav_name">Reports</span> </a> <a href="#" class="nav_link"> <i class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#" class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span class="nav_name">Files</span> </a> <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span class="nav_name">Stats</span> </a> </div>
-            </div> <a href="logout.php" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span class="nav_name">Sign out</span> </a>
+            <div> <a class="nav_logo"> <i class='bx bx-grid-alt nav_logo-icon'></i> <span class="nav_logo-name">Dashboard</span> </a>
+                <div class="nav_list"><a href="clients.php" class="nav_link" id="users"> <i class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a href="#" class="nav_link"> <i class='bx bx-message-square-detail nav_icon'></i> <span class="nav_name">Reports</span> </a> <a href="ticekts.php" class="nav_link"> <i class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#" class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span class="nav_name">Files</span> </a> <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span class="nav_name">Stats</span> </a> </div>
+            </div> <a href="../logout.php" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span class="nav_name">Sign out</span> </a>
         </nav>
     </div>
     <!--Container Main start-->

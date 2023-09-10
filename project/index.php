@@ -6,7 +6,7 @@
   require_once(__ROOT__.'\project\config.php');
 
   if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
-    header('Location: dashboard.php');
+    header('Location: panel/dashboard.php');
   }
 
   if(isset($_SESSION['username'])){

@@ -83,8 +83,11 @@
                                 $stmt->bind_param("i", $_SESSION['user_id']);
                                 $stmt->execute();
                                 $result = $stmt->get_result();
+                                
+                                if ($result->num_rows > 0) {
+                                    echo '<div class="col-12 text-center pb-2 fs-5">Your tickets: </div>';
+                                }
 
-                                echo '<div class="col-12 text-center pb-2 fs-5">Your tickets: </div>';
                                 while ($row = $result->fetch_assoc()) {
                                     $topic = $row['topic'];
                                     $status = $row['status'];

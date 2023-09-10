@@ -59,6 +59,7 @@
                                 while ($row = $result->fetch_assoc()) {
                                     $topic = $row['topic'];
                                     $status = $row['status'];
+                                    $description = $row['description'];
                                     if($status == True) {
                                         $status = "Open";
                                     }
@@ -68,15 +69,18 @@
                                     $last_updated = date("d.m.Y, H:i", strtotime($row['last_updated']));
                                     echo('
                                         <div class="ticket card p-2 p-sm-0">
-                                            <div class="row">
-                                                <div class="col-12 col-sm-2 col-md-4 text-center text-sm-start">
-
+                                            <div class="row text-center p-3">
+                                                <div class="col-6"></div>
+                                                <div class="col-6">
+                                                    ' . $last_updated . '
                                                 </div>
-                                                <div class="col-12 col-sm-5 col-md-4 text-center text-sm-end text-md-center" style="padding-top: 6px;">
+                                                <div class="col-6"></div>
+                                                <div class="col-6 pb-2">
                                                     ' . $topic . '
                                                 </div>
-                                                <div class="col-12 col-sm-5 col-md-4 text-center text-sm-end" style="padding-top: 6px; word-spacing: 0.10rem; padding-right: 20px;">
-                                                    ' . $last_updated . '
+                                                <div class="col-6"></div>
+                                                <div class="col-6">
+                                                    ' . $description . '
                                                 </div>
                                             </div>
                                         </div>'
