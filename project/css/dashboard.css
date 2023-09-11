@@ -431,3 +431,8 @@ a {
 .ticketrow:hover {
     border: 2px dashed #4723D9;
 }
+
+.bubble {
+    border: 2px solid white;
+    border-radius: 0.525rem;
+}

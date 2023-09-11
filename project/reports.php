@@ -71,7 +71,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="reports" style="padding-bottom: 0.25rem !important">Description</label>
+                                    <span style="padding-bottom: 0.25rem !important">Description</span>
                                     <textarea class="form-control" id="reports_textarea" rows="8" name="description"></textarea>
                                 </div>
                                 <div class="text-center">
