@@ -5,7 +5,7 @@ define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__ . '\project\config.php');
 
 if (isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
-    header('Location: dashboard.php');
+    header('Location: panel/dashboard.php');
     exit(); // Make sure to exit after redirection
 }
 

@@ -9,7 +9,7 @@
   }
   
   if($_SESSION['staff'] == True) {
-    header('Location: dashboard.php');
+    header('Location: panel/dashboard.php');
   }
 ?>
 

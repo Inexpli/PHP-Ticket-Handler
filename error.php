@@ -1,5 +1,7 @@
 <?php 
 
+session_start();
+
 $error = $_SERVER['REDIRECT_STATUS'];
 
 if($error == 404) {
@@ -30,7 +32,13 @@ if($error == 404) {
                             <div class="col-12 col-md-8 col-lg-6 col-xl-5 text-center pt-5">
                                 <h1 class="pb-3"><?php echo($error_title); ?></h1>
                                 <h5>You will be redirected to home page in <span id="countdowntimer">5</span> seconds</h5>
-                                <?php header( "Refresh:5; url=index.php", true, 303); ?>
+                                <?php
+                                    if (isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
+                                        header( "Refresh:5; url=dashboard.php", true, 303);
+                                    } else {
+                                        header( "Refresh:5; url=index.php", true, 303);
+                                    }
+                                ?>
                             </div>
                         </div>
                     </div>
