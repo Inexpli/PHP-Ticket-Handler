@@ -54,6 +54,53 @@
     });
 </script>
 
+<?php
+  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $admin_id = $_SESSION['user_id'];
+    $answer = $_POST['answer'];
+    if (isset($answer) && isset($admin_id)) {
+            $errors = array();
+
+            if (strlen($answer) < 20) {
+                $errors[] = "Answer is too short, give more details.";
+            }
+
+            if (empty($errors)) {
+
+                $stmt = $conn->prepare("INSERT INTO `answers` (answer, admin_id, report_id) VALUES(?,?,?)");
+                $stmt->bind_param("sii", $answer, $admin_id, $_GET['id']);
+                $stmt->execute();
+
+                $currentTime = date("Y-m-d H:i:s");
+
+                $stmt2 = $conn->prepare("UPDATE `reports` SET last_updated = ?, status = 0 WHERE id = ?");
+                $stmt2->bind_param("si", $currentTime, $_GET['id']);
+                $stmt2->execute();
+
+                header('Location: tickets.php');
+
+            } else {
+                // Display error messages
+                foreach ($errors as $error) {
+                    echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
+                    <strong>' . $error . '</strong>.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>';
+                }
+            }
+        } 
+
+        else {
+            echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
+            <strong>You cannot send empty answer.</strong>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>';
+        }
+
+    exit();
+}
+?>
+
 <style>
     @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
 </style>
@@ -64,7 +111,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket: <?php $_GET['id'] ?></title>
+    <title>Ticket: <?php echo $_GET['id']; ?></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -118,7 +165,7 @@
                     <div class="row p-3 mb-5">
                         <div class="col-12 text-center">'. $created .'</div>
                         <div class="col-12 pb-4 text-center">'. $topic .'</div>
-                        <div class="col-6 m-5 p-4 bubble">'. $description .'<br><br><div class="text-start">'. $last_updated .'</div></div>
+                        <div class="col-5 m-5 p-4 bubble">'. $description .'<br><br><div class="text-start">'. $last_updated .'</div></div>
                     </div>'
                 );
             }
@@ -129,9 +176,9 @@
                         <div class="container-fluid mt-5 mb-5">
                             <div class="row d-flex align-items-center justify-content-center">
                                 <div class="col-12 col-sm-10 col-md-9 col-lg-7 col-xl-6">
-                                    <form class="px-2 py-2 px-md-4 py-md-4" action="ticket_r.php" method="POST">
+                                    <form class="px-2 py-2 px-md-4 py-md-4" action="ticket_r.php?id='. $_GET['id'] .'" method="POST">
                                         <div class="form-group">
-                                            <textarea class="form-control" id="answer_textarea" rows="8" name="answear" id="answer"></textarea>
+                                            <textarea class="form-control" id="answer_textarea" rows="8" name="answer" id="answer"></textarea>
                                         </div>
                                         <div class="text-center">
                                             <button class="btn btn-primary mt-4 signup" type="submit" style="width: 150px;">Answer</button>
