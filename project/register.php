@@ -13,73 +13,6 @@ if (isset($_SESSION['username'])) {
     header('Location: home.php');
     exit(); // Make sure to exit after redirection
 }
-
-$errors = array(); // Initialize the errors array
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $login = $_POST['login'];
-    $email = $_POST['email'];
-    $pesel = $_POST['pesel'];
-    $password1 = $_POST['password'];
-    $password2 = $_POST['password_r'];
-    $epassword = password_hash($password1, PASSWORD_DEFAULT);
-
-    if (isset($login) && isset($email) && isset($pesel) && isset($password1) && isset($password2)) {
-        // Prepare statements for validation
-        $login_stmt = $conn->prepare("SELECT * FROM users WHERE login = ?");
-        $login_stmt->bind_param("s", $login);
-        $login_stmt->execute();
-        $login_result = $login_stmt->get_result();
-
-        $email_stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-        $email_stmt->bind_param("s", $email);
-        $email_stmt->execute();
-        $email_result = $email_stmt->get_result();
-
-        $pesel_stmt = $conn->prepare("SELECT * FROM clientdb WHERE pesel = ?");
-        $pesel_stmt->bind_param("s", $pesel);
-        $pesel_stmt->execute();
-        $pesel_result = $pesel_stmt->get_result();
-
-        // Validation checks...
-        
-        if (count(array_filter($_POST)) != count($_POST)) {
-            $errors[] = "• Fill in all fields";
-        }
-        // Other validation checks...
-
-        if (mysqli_num_rows($login_result) > 0) {
-            $errors[] = "• This username already exists";
-        }
-        if (mysqli_num_rows($email_result) > 0) {
-            $errors[] = "• This email is already taken";
-        }
-        if (mysqli_num_rows($pesel_result) <= 0) {
-            $errors[] = "• Client with this pesel doesn't exist, consider pesel validation";
-        }
-        // Other validation checks...
-
-        if (empty($errors)) {
-            $stmt = $conn->prepare("INSERT INTO `users` (login,password,email) VALUES(?,?,?)");
-            $stmt->bind_param("sss", $login, $epassword, $email);
-            $stmt->execute();
-
-            $stmt2 = $conn->prepare("SELECT id FROM `users` WHERE login = ?");
-            $stmt2->bind_param("s", $login);
-            $stmt2->execute();
-            $result = $stmt2->get_result();
-            $row = $result->fetch_assoc();
-            $client_ID = $row['id'];
-
-            $stmt3 = $conn->prepare("UPDATE `clientdb` SET client_id = ? WHERE pesel = ?");
-            $stmt3->bind_param("is", $client_ID, $pesel);
-            $stmt3->execute();
-
-            header('Location: login.php');
-            exit(); // Make sure to exit after redirection
-        }
-    }
-}
 ?>
 
 <!doctype html>
@@ -87,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <head>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="js/script.js"></script>
     <title>Register</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -96,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <!-- Bootstrap Icons CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" rel="stylesheet">
     <!-- JQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   </head>
@@ -153,3 +84,86 @@ $('#pesel').keydown(function(e) {
             e.preventDefault();
 });
 </script>
+
+<?php 
+
+$errors = array(); // Initialize the errors array
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $login = $_POST['login'];
+    $email = $_POST['email'];
+    $pesel = $_POST['pesel'];
+    $password1 = $_POST['password'];
+    $password2 = $_POST['password_r'];
+    $epassword = password_hash($password1, PASSWORD_DEFAULT);
+
+    if (isset($login) && isset($email) && isset($pesel) && isset($password1) && isset($password2)) {
+        // Prepare statements for validation
+        $login_stmt = $conn->prepare("SELECT * FROM users WHERE login = ?");
+        $login_stmt->bind_param("s", $login);
+        $login_stmt->execute();
+        $login_result = $login_stmt->get_result();
+
+        $email_stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+        $email_stmt->bind_param("s", $email);
+        $email_stmt->execute();
+        $email_result = $email_stmt->get_result();
+
+        $pesel_stmt = $conn->prepare("SELECT * FROM clientdb WHERE pesel = ?");
+        $pesel_stmt->bind_param("s", $pesel);
+        $pesel_stmt->execute();
+        $pesel_result = $pesel_stmt->get_result();
+
+        // Validation checks...
+        
+        if (count(array_filter($_POST)) != count($_POST)) {
+            $errors[] = "• Fill in all fields";
+        }
+        // Other validation checks...
+        else {
+            if (mysqli_num_rows($login_result) > 0) {
+                $errors[] = "• This username already exists";
+            }
+            if (strlen($login) < 3) {
+                $errors[] = "• Username has to be longer than 2 characters";
+            }
+            if (mysqli_num_rows($email_result) > 0) {
+                $errors[] = "• This email is already taken";
+            }
+            if (mysqli_num_rows($pesel_result) <= 0) {
+                $errors[] = "• Client with this pesel doesn't exist, consider pesel validation";
+            }
+        }
+        // Other validation checks...
+
+        if (empty($errors)) {
+            $stmt = $conn->prepare("INSERT INTO `users` (login,password,email) VALUES(?,?,?)");
+            $stmt->bind_param("sss", $login, $epassword, $email);
+            $stmt->execute();
+
+            $stmt2 = $conn->prepare("SELECT id FROM `users` WHERE login = ?");
+            $stmt2->bind_param("s", $login);
+            $stmt2->execute();
+            $result = $stmt2->get_result();
+            $row = $result->fetch_assoc();
+            $client_ID = $row['id'];
+
+            $stmt3 = $conn->prepare("UPDATE `clientdb` SET client_id = ? WHERE pesel = ?");
+            $stmt3->bind_param("is", $client_ID, $pesel);
+            $stmt3->execute();
+
+            header('Location: login.php');
+            exit(); // Make sure to exit after redirection
+        }
+        else {
+            echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">';
+            echo '<strong>Error(s):</strong><br>';
+            foreach ($errors as $error) {
+                echo $error . '<br>';
+            }
+            echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+            echo '</div>';
+        }
+    }
+}
+?>

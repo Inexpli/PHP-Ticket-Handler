@@ -113,3 +113,8 @@ input[type=number] {
     --bs-btn-disabled-bg: #4723D9;
     --bs-btn-disabled-border-color: #4723D9;
 }
+
+.bubble {
+    border: 2px solid rgb(80, 80, 80);
+    border-radius: 0.525rem;
+}
