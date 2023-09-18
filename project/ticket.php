@@ -2,12 +2,60 @@
   session_start();
   require_once "config.php";
 
+  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $message = $_POST['message'];
+    if (isset($message)) {
+        $errors = array();
+
+        if (strlen($message) < 10) {
+            $errors[] = "Message is too short, give more details.";
+        }
+
+        if (empty($errors)) {
+          $stmt1 = $conn->prepare("SELECT receiver FROM `reports` WHERE id = ?");
+          $stmt1->bind_param("i", $_GET['id']);
+          $stmt1->execute();
+          $result = $stmt1->get_result();
+          while ($row = $result->fetch_assoc()) {
+            $receiver = $row['receiver'];
+          }
+
+          $stmt2 = $conn->prepare("INSERT INTO `messages` (message, sender_id, admin_id, report_id) VALUES (?, ?, ?, ?)");
+          $stmt2->bind_param("siii", $message, $_SESSION['user_id'], $receiver, $_GET['id']);
+          $stmt2->execute();
+
+          $stmt3 = $conn->prepare("UPDATE `reports` SET last_updated = ?, status = 1 WHERE id = ?");
+          $stmt3->bind_param("si", $currentTime, $_GET['id']);
+          $stmt3->execute();
+        } else {
+            // Wyświetl komunikat o błędzie
+            foreach ($errors as $error) {
+                echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                    <strong>' . $error . '</strong>.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>';
+            }
+        }
+        
+        // Przekieruj na stronę po przetworzeniu formularza
+        header("Location: ticket.php?id=" . $_GET['id']);
+        exit();
+    } else {
+        echo '<div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+            <strong>Fill in all required fields</strong>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>';
+    }
+  }
+
   if(!isset($_SESSION['username'])){
     header('Location: login.php');
+    exit(); // Dodaj exit, aby przerwać wykonywanie skryptu
   }
   
   if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
     header('Location: panel/dashboard.php');
+    exit(); // Dodaj exit, aby przerwać wykonywanie skryptu
   }
 ?>
 
@@ -45,32 +93,31 @@
       </div>
     </header>
     <div class="height-100" id="main-body">
+      <div class="ticket p-2 mb-5 p-sm-0">
         <?php
             $stmt = $conn->prepare("SELECT * FROM `reports` WHERE id = ?");
             $stmt->bind_param("i", $_GET['id']);
             $stmt->execute();
             $result = $stmt->get_result();
-            echo('<div class="ticket p-2 p-sm-0" style="border: 2px dashed #4723D9; border-radius: 0.525rem;">');
             while ($row = $result->fetch_assoc()) {
                 $topic = $row['topic'];
                 $user_id = $row['user_id'];
                 $status = $row['status'];
                 $description = $row['description'];
                 $created1 = $row['created'];
-                if($status == True) {
-                    $status = "Open";
-                }
-                else {
-                    $status = "Closed";
-                }
                 $created = date("d.m.Y, H:i", strtotime($row['created']));
 
-                echo('<div class="row p-3 mb-5">
-                <div class="col-12 text-center">'. $created .'</div>
+                echo('
+                <div class="row p-3">
                 <div class="col-12 pb-4 text-center">'. $topic .'</div>
+                </div>
                 <div class="row">
-                  <div class="col-6 p-3 bubble">'. $description .'<br><br><div class="text-start">'. $created .'</div></div>
-                  <div class="col-6"></div>
+                <div class="col-6"></div>
+                <div class="col-6">
+                <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; word-break: break-word; float:right; text-align: right; margin-bottom: 1px;">
+                '. $description .'<br><br><div class="text-end">'. $created .'</div>
+                </div>
+                </div>
                 </div>');
 
                 $stmt2 = $conn->prepare("SELECT * FROM `messages` WHERE report_id = ?");
@@ -79,27 +126,52 @@
                 $result2 = $stmt2->get_result();
                 if(mysqli_num_rows($result2) > 0) {
                   while ($row2 = $result2->fetch_assoc()) {
-                      $message = $row2['message'];
-                      $sender = $row2['sender_id'];
-                      $created2 = $row2['created'];
-                      $created2 = date("d.m.Y, H:i", strtotime($row2['created']));
-                  }
-                  if($sender == $user_id) {
-                    echo('
-                    <div class="row">
-                    <div class="col-6 p-3 bubble">'. $message .'<br><br><div class="text-start">'. $created2 .'</div></div>
-                    <div class="col-6"></div></div>');
-                  }
-                  else {
-                    echo('
-                    <div class="row">
-                        <div class="col-6"></div>
-                        <div class="col-6 p-3 mt-5 bubble">'. $message .'<br><br><div class="text-end">'. $created2 .'</div></div>
-                    </div></div>');
+                    $id = $row2['id'];
+                    $message = $row2['message'];
+                    $sender = $row2['sender_id'];
+                    $admin_id = $row2['admin_id'];
+                    $created2 = $row2['created'];
+                    $created2 = date("d.m.Y, H:i", strtotime($row2['created']));
+                    if($sender == $user_id) {
+                      echo('
+                      <div class="row">
+                      <div class="col-6"></div>
+                      <div class="col-6">
+                      <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; word-break: break-word; float:right; text-align: right; margin-bottom: 1px;">
+                      '. $message .'<br><br><div class="text-end">'. $created2 .'</div>
+                      </div>
+                      </div>
+                      </div>');
+                    }
+                    else {
+                      echo('
+                      <div class="row">
+                      <div class="col-6">
+                      <div class="bubble p-2" style="word-wrap: word-wrap: break-word; word-break: break-word; display: inline-block; margin-bottom: 1px;">
+                      '. $message .'<br><br><div class="text-start">'. $created2 .'</div>
+                      </div>
+                      </div>
+                      <div class="col-6"></div>
+                      </div>');
+                    }
                   }
                 }
+              echo("</div>");
             }
         ?>
+      </div>
+      <div class="row d-flex align-items-center justify-content-center mb-5">
+        <div class="col-12 col-sm-10 col-md-9 col-lg-7 col-xl-6">
+          <form action="ticket.php?id=<?php echo($_GET['id']) ?>" method="POST" id="message">
+              <div class="form-group">
+                  <textarea class="form-control" id="message_textarea" rows="8" name="message"></textarea>
+              </div>
+              <div class="text-center">
+                  <button class="btn btn-primary mt-4 signup" type="submit" style="width: 150px;">Submit</button>
+              </div>
+          </form>
+        </div>
+      </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -92,10 +92,10 @@
                                     $status = $row['status'];
                                     $id = $row['id'];
                                     if($status == True) {
-                                        $status = "Open";
+                                        $status = "Waiting...";
                                     }
                                     else {
-                                        $status = "Closed";
+                                        $status = "Answered";
                                     }
                                     $last_updated = date("d.m.Y, H:i", strtotime($row['last_updated']));
                                     echo('

@@ -75,10 +75,22 @@
         <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
     </header>
     <div class="l-navbar" id="nav-bar">
-        <nav class="nav">
-            <div> <a href="dashboard.php" class="nav_logo"> <i class='bx bx-grid-alt nav_logo-icon'></i> <span class="nav_logo-name">Dashboard</span> </a>
-                <div class="nav_list"><a class="nav_link active" id="users"> <i class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a href="tickets.php" class="nav_link"> <i class='bx bx-message-square-detail nav_icon'></i> <span class="nav_name">Reports</span> </a> <a href="#" class="nav_link"> <i class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#" class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span class="nav_name">Files</span> </a> <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span class="nav_name">Stats</span> </a> </div>
-            </div> <a href="../logout.php" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span class="nav_name">Sign out</span> </a>
+    <nav class="nav">
+            <div> <a class="nav_logo" href="dashboard.php"> <i class='bx bx-grid-alt nav_logo-icon'></i> <span
+                        class="nav_logo-name">Dashboard</span> </a>
+                <div class="nav_list"><a href="clients.php" class="nav_link active" id="users"> <i
+                            class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a
+                        href="tickets.php" class="nav_link"> <i class='bx bx-message-square-detail nav_icon'></i>
+                        <span class="nav_name">Reports</span> </a>
+                        <a href="chat.php" class="nav_link"> <i
+                            class='bx bx-message nav_icon'></i> <span class="nav_name">Chat</span> </a>
+                        <a href="#" class="nav_link"> <i
+                            class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#"
+                        class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span class="nav_name">Files</span> </a>
+                    <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span
+                            class="nav_name">Stats</span> </a> </div>
+            </div> <a href="../logout.php" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span
+                    class="nav_name">Sign out</span> </a>
         </nav>
     </div>
     <!--Container Main start-->

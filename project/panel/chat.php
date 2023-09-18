@@ -79,14 +79,14 @@
         <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
     </header>
     <div class="l-navbar" id="nav-bar">
-        <nav class="nav">
+    <nav class="nav">
             <div> <a class="nav_logo" href="dashboard.php"> <i class='bx bx-grid-alt nav_logo-icon'></i> <span
                         class="nav_logo-name">Dashboard</span> </a>
                 <div class="nav_list"><a href="clients.php" class="nav_link" id="users"> <i
                             class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a
-                        href="tickets.php" class="nav_link active"> <i class='bx bx-message-square-detail nav_icon'></i>
+                        href="tickets.php" class="nav_link"> <i class='bx bx-message-square-detail nav_icon'></i>
                         <span class="nav_name">Reports</span> </a>
-                        <a href="chat.php" class="nav_link"> <i
+                        <a href="chat.php" class="nav_link active"> <i
                             class='bx bx-message nav_icon'></i> <span class="nav_name">Chat</span> </a>
                         <a href="#" class="nav_link"> <i
                             class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#"
@@ -99,39 +99,7 @@
     </div>
     <!--Container Main start-->
     <div class="height-100 bg-dark" id="main-body" style="color: white">
-        <?php
-            $stmt = $conn->prepare("SELECT id, topic, SUBSTRING_INDEX(description, ' ', 20) AS short_description, created, last_updated FROM `reports` WHERE status = 1 ORDER BY last_updated ASC");
-            $stmt->execute();
-            $result = $stmt->get_result();
-            echo('<table class="table table-dark">
-                <thead>
-                  <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Topic</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Created</th>
-                    <th scope="col">Last updated</th>
-                  </tr>
-                </thead>
-                <tbody>'
-            );
-            while ($row = $result->fetch_assoc()) {
-                $id = $row['id'];
-                $topic = $row['topic'];
-                $description = $row['short_description'];
-                $created = $row['created'];
-                $last_updated = $row['last_updated'];
-                echo('
-                      <tr onclick="redirect('. $id .')" style="cursor: pointer;" class="ticketrow">
-                        <th scope="row">'. $id .'</th>
-                        <td>'. $topic .'</td>
-                        <td>'. $description .' ...</td>
-                        <td>'. $created .'</td>
-                        <td>'. $last_updated .'</td>
-                      </tr>');
-            }
-            echo('</tbody></table>');
-        ?>
+       
     </div>
 
     <!-- Bootstrap JS -->
@@ -139,9 +107,3 @@
 </body>
 
 </html>
-
-<script>
-    function redirect(id) {
-        window.location = `ticket_r.php?id=${id}`;
-    }
-</script>

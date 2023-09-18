@@ -127,13 +127,16 @@
         <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
     </header>
     <div class="l-navbar" id="nav-bar">
-        <nav class="nav">
-            <div> <a class="nav_logo"> <i class='bx bx-grid-alt nav_logo-icon'></i> <span
+    <nav class="nav">
+            <div> <a class="nav_logo" href="dashboard.php"> <i class='bx bx-grid-alt nav_logo-icon'></i> <span
                         class="nav_logo-name">Dashboard</span> </a>
                 <div class="nav_list"><a href="clients.php" class="nav_link" id="users"> <i
                             class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a
                         href="tickets.php" class="nav_link active"> <i class='bx bx-message-square-detail nav_icon'></i>
-                        <span class="nav_name">Reports</span> </a> <a href="#" class="nav_link"> <i
+                        <span class="nav_name">Reports</span> </a>
+                        <a href="chat.php" class="nav_link"> <i
+                            class='bx bx-message nav_icon'></i> <span class="nav_name">Chat</span> </a>
+                        <a href="#" class="nav_link"> <i
                             class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#"
                         class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span class="nav_name">Files</span> </a>
                     <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span
@@ -143,32 +146,68 @@
         </nav>
     </div>
     <!--Container Main start-->
-    <div class="height-100 bg-dark" id="main-body" style="color: white">
+    <div class="bg-dark" id="main-body" style="color: white">
         <?php
             $stmt = $conn->prepare("SELECT * FROM `reports` WHERE id = ?");
             $stmt->bind_param("i", $_GET['id']);
             $stmt->execute();
             $result = $stmt->get_result();
-            echo('<div class="ticket p-2 p-sm-0" style="border: 2px dashed #4723D9; border-radius: 0.525rem;">');
             while ($row = $result->fetch_assoc()) {
                 $topic = $row['topic'];
+                $user_id = $row['user_id'];
                 $status = $row['status'];
                 $description = $row['description'];
-                if($status == True) {
-                    $status = "Open";
-                }
-                else {
-                    $status = "Closed";
-                }
-                $last_updated = date("d.m.Y, H:i", strtotime($row['last_updated']));
                 $created = date("d.m.Y, H:i", strtotime($row['created']));
                 echo('
-                    <div class="row p-3 mb-5">
-                        <div class="col-12 text-center">'. $created .'</div>
-                        <div class="col-12 pb-4 text-center">'. $topic .'</div>
-                        <div class="col-5 m-5 p-4 bubble">'. $description .'<br><br><div class="text-start">'. $last_updated .'</div></div>
-                    </div>'
+                <div class="row p-3 mb-5">
+                <div class="col-12 text-center">'. $created .'</div>
+                <div class="col-12 pb-4 text-center">'. $topic .'</div>
+                </div>
+                <div class="col-6">
+                  <div class="bubble p-2" style="word-wrap: break-word; display: inline-block;">
+                  '. $description .'<br><br><div class="text-start">'. $created .'</div>
+                  </div>
+                </div>
+                <div class="col-6"></div>'
                 );
+
+                $stmt2 = $conn->prepare("SELECT * FROM `messages` WHERE report_id = ?");
+                $stmt2->bind_param("i", $_GET['id']);
+                $stmt2->execute();
+                $result2 = $stmt2->get_result();
+                if(mysqli_num_rows($result2) > 0) {
+                  while ($row2 = $result2->fetch_assoc()) {
+                    $id = $row2['id'];
+                    $message = $row2['message'];
+                    $sender = $row2['sender_id'];
+                    $admin_id = $row2['admin_id'];
+                    $created2 = $row2['created'];
+                    $created2 = date("d.m.Y, H:i", strtotime($row2['created']));
+                    if($sender == $user_id) {
+                      echo('
+                      <div class="row">
+                      <div class="col-6">
+                      <div class="bubble p-2" style="word-wrap: break-word; display: inline-block; margin-bottom: 1px;">
+                      '. $message .'<br><br><div class="text-start">'. $created2 .'</div>
+                      </div>
+                      </div>
+                      <div class="col-6"></div>
+                      </div>');
+                    }
+                    else {
+                      echo('
+                      <div class="row">
+                      <div class="col-6"></div>
+                      <div class="col-6">
+                      <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; float:right; text-align: right; margin-bottom: 1px;">
+                      '. $message .'<br><br><div class="text-end">'. $created2 .'</div>
+                      </div>
+                      </div>
+                      </div>');
+                    }
+                  }
+                }
+              echo("</div>");
             }
             echo('
             <div class="row no-gutter">
