@@ -60,14 +60,17 @@
                             <form class="card px-4 px-sm-4 px-md-5 py-4 py-sm-4 py-md-5 mb-5" action="reports.php" method="POST" id="reports">
                                 <h3 class="mb-2 font-weight-bold text-center pb-2 pb-md-4">Submit a ticket</h3>
                                 <div class="form-input pb-2">
-                                    <select class="form-select form-control" aria-label="form-select" name="topic">
-                                        <option selected>Topic</option>
+                                    <select class="form-select form-control" aria-label="form-select" name="category">
+                                        <option selected>Category</option>
                                         <option value="Questions">Questions</option>
                                         <option value="Technical Issues">Technical Issues</option>
                                         <option value="Transactions">Transactions</option>
                                         <option value="Refunds">Refunds</option>
                                         <option value="Other">Other</option>
                                     </select>
+                                </div>
+                                <div class="form-input pb-2">
+                                    <input class="form-control" type="text" placeholder="Topic" aria-label="login input" name="topic">
                                 </div>
                                 <div class="form-group">
                                     <span style="padding-bottom: 0.25rem !important">Description</span>
@@ -88,7 +91,7 @@
                                 }
 
                                 while ($row = $result->fetch_assoc()) {
-                                    $topic = $row['topic'];
+                                    $category = $row['category'];
                                     $status = $row['status'];
                                     $id = $row['id'];
                                     if($status == True) {
@@ -105,7 +108,7 @@
                                                     <button class="btn btn-success btn-ticket"><a href="ticket.php?id='. $id .'" style="color: white;">' . $status . '</a></button>
                                                 </div>
                                                 <div class="col-12 col-sm-5 col-md-4 text-center text-sm-end text-md-center" style="padding-top: 6px;">
-                                                    ' . $topic . '
+                                                    ' . $category . '
                                                 </div>
                                                 <div class="col-12 col-sm-5 col-md-4 text-center text-sm-end" style="padding-top: 6px; word-spacing: 0.10rem; padding-right: 20px;">
                                                     ' . $last_updated . '
@@ -128,12 +131,13 @@
 
 <?php
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $category = $_POST['category'];
     $topic = $_POST['topic'];
     $description = $_POST['description'];
     if (isset($topic) && isset($description)) {
             $errors = array();
 
-            if (empty($topic) || $topic == "Topic") {
+            if (empty($topic) || $category == "Category") {
                 $errors[] = "Invalid topic.";
             }
 
@@ -145,8 +149,8 @@
 
                 date_default_timezone_set('Europe/Warsaw');
 
-                $stmt = $conn->prepare("INSERT INTO `reports` (user_id, topic, description, status, created, last_updated) VALUES (?, ?, ?, 1, date('d-m-Y, H:i'), date('d-m-Y, H:i'))");
-                $stmt->bind_param("iss", $_SESSION['user_id'], $topic, $description);
+                $stmt = $conn->prepare("INSERT INTO `reports` (user_id, category, topic, description, status, created, last_updated) VALUES (?, ?, ?, ?, 1, date('d-m-Y, H:i'), date('d-m-Y, H:i'))");
+                $stmt->bind_param("isss", $_SESSION['user_id'], $category, $topic, $description);
                 $stmt->execute();
                 
                 echo '<meta http-equiv="refresh" content="0">';

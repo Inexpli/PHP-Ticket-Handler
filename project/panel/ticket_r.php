@@ -153,14 +153,16 @@
             $stmt->execute();
             $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
+                $category = $row['category'];
                 $topic = $row['topic'];
                 $user_id = $row['user_id'];
                 $status = $row['status'];
                 $description = $row['description'];
                 $created = date("d.m.Y, H:i", strtotime($row['created']));
                 echo('
-                <div class="row p-3 mb-5">
+                <div class="row p-3 pt-4 mb-5">
                 <div class="col-12 text-center">'. $created .'</div>
+                <div class="col-12 text-center">'. $category .'</div>
                 <div class="col-12 pb-4 text-center">'. $topic .'</div>
                 </div>
                 <div class="col-6">
@@ -199,7 +201,7 @@
                       <div class="row">
                       <div class="col-6"></div>
                       <div class="col-6">
-                      <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; float:right; text-align: right; margin-bottom: 1px;">
+                      <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; float:right; margin-bottom: 1px;">
                       '. $message .'<br><br><div class="text-end">'. $created2 .'</div>
                       </div>
                       </div>

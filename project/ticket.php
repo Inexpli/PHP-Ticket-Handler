@@ -100,64 +100,66 @@
             $stmt->execute();
             $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
-                $topic = $row['topic'];
-                $user_id = $row['user_id'];
-                $status = $row['status'];
-                $description = $row['description'];
-                $created1 = $row['created'];
-                $created = date("d.m.Y, H:i", strtotime($row['created']));
+              $category = $row['category'];
+              $topic = $row['topic'];
+              $user_id = $row['user_id'];
+              $status = $row['status'];
+              $description = $row['description'];
+              $created = date("d.m.Y, H:i", strtotime($row['created']));
 
-                echo('
-                <div class="row p-3">
-                <div class="col-12 pb-4 text-center">'. $topic .'</div>
-                </div>
-                <div class="row">
-                <div class="col-6"></div>
-                <div class="col-6">
-                <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; word-break: break-word; float:right; text-align: right; margin-bottom: 1px;">
-                '. $description .'<br><br><div class="text-end">'. $created .'</div>
-                </div>
-                </div>
-                </div>');
+              echo('
+              <div class="row p-3">
+              <div class="col-12 text-center">'. $created .'</div>
+              <div class="col-12 text-center">'. $category .'</div>
+              <div class="col-12 pb-4 text-center">'. $topic .'</div>
+              </div>
+              <div class="row">
+              <div class="col-6"></div>
+              <div class="col-6">
+              <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; word-break: break-word; float:right; margin-bottom: 1px;">
+              '. $description .'<br><br><div class="text-end">'. $created .'</div>
+              </div>
+              </div>
+              </div>');
 
-                $stmt2 = $conn->prepare("SELECT * FROM `messages` WHERE report_id = ?");
-                $stmt2->bind_param("i", $_GET['id']);
-                $stmt2->execute();
-                $result2 = $stmt2->get_result();
-                if(mysqli_num_rows($result2) > 0) {
-                  while ($row2 = $result2->fetch_assoc()) {
-                    $id = $row2['id'];
-                    $message = $row2['message'];
-                    $sender = $row2['sender_id'];
-                    $admin_id = $row2['admin_id'];
-                    $created2 = $row2['created'];
-                    $created2 = date("d.m.Y, H:i", strtotime($row2['created']));
-                    if($sender == $user_id) {
-                      echo('
-                      <div class="row">
-                      <div class="col-6"></div>
-                      <div class="col-6">
-                      <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; word-break: break-word; float:right; text-align: right; margin-bottom: 1px;">
-                      '. $message .'<br><br><div class="text-end">'. $created2 .'</div>
-                      </div>
-                      </div>
-                      </div>');
-                    }
-                    else {
-                      echo('
-                      <div class="row">
-                      <div class="col-6">
-                      <div class="bubble p-2" style="word-wrap: word-wrap: break-word; word-break: break-word; display: inline-block; margin-bottom: 1px;">
-                      '. $message .'<br><br><div class="text-start">'. $created2 .'</div>
-                      </div>
-                      </div>
-                      <div class="col-6"></div>
-                      </div>');
-                    }
+              $stmt2 = $conn->prepare("SELECT * FROM `messages` WHERE report_id = ?");
+              $stmt2->bind_param("i", $_GET['id']);
+              $stmt2->execute();
+              $result2 = $stmt2->get_result();
+              if(mysqli_num_rows($result2) > 0) {
+                while ($row2 = $result2->fetch_assoc()) {
+                  $id = $row2['id'];
+                  $message = $row2['message'];
+                  $sender = $row2['sender_id'];
+                  $admin_id = $row2['admin_id'];
+                  $created2 = $row2['created'];
+                  $created2 = date("d.m.Y, H:i", strtotime($row2['created']));
+                  if($sender == $user_id) {
+                    echo('
+                    <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col-6">
+                    <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; word-break: break-word; float:right; margin-bottom: 1px;">
+                    '. $message .'<br><br><div class="text-end">'. $created2 .'</div>
+                    </div>
+                    </div>
+                    </div>');
+                  }
+                  else {
+                    echo('
+                    <div class="row">
+                    <div class="col-6">
+                    <div class="bubble p-2" style="word-wrap: word-wrap: break-word; word-break: break-word; display: inline-block; margin-bottom: 1px;">
+                    '. $message .'<br><br><div class="text-start">'. $created2 .'</div>
+                    </div>
+                    </div>
+                    <div class="col-6"></div>
+                    </div>');
                   }
                 }
-              echo("</div>");
-            }
+              }
+            echo("</div>");
+          }
         ?>
       </div>
       <div class="row d-flex align-items-center justify-content-center mb-5">

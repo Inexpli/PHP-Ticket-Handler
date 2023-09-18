@@ -100,13 +100,14 @@
     <!--Container Main start-->
     <div class="height-100 bg-dark" id="main-body" style="color: white">
         <?php
-            $stmt = $conn->prepare("SELECT id, topic, SUBSTRING_INDEX(description, ' ', 20) AS short_description, created, last_updated FROM `reports` WHERE status = 1 ORDER BY last_updated ASC");
+            $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 20) AS short_description, created, last_updated FROM `reports` WHERE status = 1 ORDER BY last_updated ASC");
             $stmt->execute();
             $result = $stmt->get_result();
             echo('<table class="table table-dark">
                 <thead>
                   <tr>
                     <th scope="col">ID</th>
+                    <th scope="col">Category</th>
                     <th scope="col">Topic</th>
                     <th scope="col">Description</th>
                     <th scope="col">Created</th>
@@ -117,6 +118,7 @@
             );
             while ($row = $result->fetch_assoc()) {
                 $id = $row['id'];
+                $category = $row['category'];
                 $topic = $row['topic'];
                 $description = $row['short_description'];
                 $created = $row['created'];
@@ -124,6 +126,7 @@
                 echo('
                       <tr onclick="redirect('. $id .')" style="cursor: pointer;" class="ticketrow">
                         <th scope="row">'. $id .'</th>
+                        <td>'. $category .'</td>
                         <td>'. $topic .'</td>
                         <td>'. $description .' ...</td>
                         <td>'. $created .'</td>
