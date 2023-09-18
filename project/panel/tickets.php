@@ -96,7 +96,7 @@
     <!--Container Main start-->
     <div class="height-100 bg-dark" id="main-body" style="color: white">
         <?php
-            $stmt = $conn->prepare("SELECT id, topic, SUBSTRING_INDEX(description, ' ', 20) AS short_description, created, last_updated FROM `reports` WHERE status = 1 ORDER BY last_updated ASC");
+            $stmt = $conn->prepare("SELECT id, topic, SUBSTRING_INDEX(description, ' ', 20) AS short_description, created, last_updated FROM `reports` WHERE status = 1 AND receiver is NULL ORDER BY last_updated ASC");
             $stmt->execute();
             $result = $stmt->get_result();
             echo('<table class="table table-dark">

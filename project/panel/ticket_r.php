@@ -57,23 +57,24 @@
 <?php
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_id = $_SESSION['user_id'];
-    $answer = $_POST['answer'];
-    if (isset($answer) && isset($admin_id)) {
+    $sender_id = $admin_id;
+    $message = $_POST['answer'];
+    if (isset($message) && isset($admin_id)) {
             $errors = array();
 
-            if (strlen($answer) < 20) {
+            if (strlen($message) < 20) {
                 $errors[] = "Answer is too short, give more details.";
             }
 
             if (empty($errors)) {
 
-                $stmt = $conn->prepare("INSERT INTO `answers` (answer, admin_id, report_id) VALUES(?,?,?)");
-                $stmt->bind_param("sii", $answer, $admin_id, $_GET['id']);
+                $stmt = $conn->prepare("INSERT INTO `messages` (message, sender_id, admin_id, report_id) VALUES(?,?,?,?)");
+                $stmt->bind_param("siii", $message, $sender_id, $admin_id, $_GET['id']);
                 $stmt->execute();
 
                 $currentTime = date("Y-m-d H:i:s");
 
-                $stmt2 = $conn->prepare("UPDATE `reports` SET last_updated = ?, status = 0 WHERE id = ?");
+                $stmt2 = $conn->prepare("UPDATE `reports` SET last_updated = ?, receiver = $admin_id, status = 0 WHERE id = ?");
                 $stmt2->bind_param("si", $currentTime, $_GET['id']);
                 $stmt2->execute();
 

@@ -53,6 +53,7 @@
             echo('<div class="ticket p-2 p-sm-0" style="border: 2px dashed #4723D9; border-radius: 0.525rem;">');
             while ($row = $result->fetch_assoc()) {
                 $topic = $row['topic'];
+                $user_id = $row['user_id'];
                 $status = $row['status'];
                 $description = $row['description'];
                 $created1 = $row['created'];
@@ -72,22 +73,30 @@
                   <div class="col-6"></div>
                 </div>');
 
-                $stmt2 = $conn->prepare("SELECT * FROM `answers` WHERE report_id = ?");
+                $stmt2 = $conn->prepare("SELECT * FROM `messages` WHERE report_id = ?");
                 $stmt2->bind_param("i", $_GET['id']);
                 $stmt2->execute();
                 $result2 = $stmt2->get_result();
                 if(mysqli_num_rows($result2) > 0) {
                   while ($row2 = $result2->fetch_assoc()) {
-                      $answer = $row2['answer'];
+                      $message = $row2['message'];
+                      $sender = $row2['sender_id'];
                       $created2 = $row2['created'];
                       $created2 = date("d.m.Y, H:i", strtotime($row2['created']));
                   }
-                echo('
-                <div class="row">
-                    <div class="col-6"></div>
-                    <div class="col-6 p-3 mt-5 bubble">'. $answer .'<br><br><div class="text-end">'. $created2 .'</div></div>
-                </div>
-                </div>');
+                  if($sender == $user_id) {
+                    echo('
+                    <div class="row">
+                    <div class="col-6 p-3 bubble">'. $message .'<br><br><div class="text-start">'. $created2 .'</div></div>
+                    <div class="col-6"></div></div>');
+                  }
+                  else {
+                    echo('
+                    <div class="row">
+                        <div class="col-6"></div>
+                        <div class="col-6 p-3 mt-5 bubble">'. $message .'<br><br><div class="text-end">'. $created2 .'</div></div>
+                    </div></div>');
+                  }
                 }
             }
         ?>
