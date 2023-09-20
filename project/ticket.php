@@ -12,12 +12,13 @@
         }
 
         if (empty($errors)) {
-          $stmt1 = $conn->prepare("SELECT receiver FROM `reports` WHERE id = ?");
+          $stmt1 = $conn->prepare("SELECT user_id, receiver FROM `reports` WHERE id = ?");
           $stmt1->bind_param("i", $_GET['id']);
           $stmt1->execute();
           $result = $stmt1->get_result();
           while ($row = $result->fetch_assoc()) {
             $receiver = $row['receiver'];
+            $user_verify = $row['user_id'];
           }
 
           $stmt2 = $conn->prepare("INSERT INTO `messages` (message, sender_id, admin_id, report_id) VALUES (?, ?, ?, ?)");
@@ -28,7 +29,6 @@
           $stmt3->bind_param("si", $currentTime, $_GET['id']);
           $stmt3->execute();
         } else {
-            // Wyświetl komunikat o błędzie
             foreach ($errors as $error) {
                 echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
                     <strong>' . $error . '</strong>.
@@ -36,10 +36,8 @@
                 </div>';
             }
         }
-        
-        // Przekieruj na stronę po przetworzeniu formularza
         header("Location: ticket.php?id=" . $_GET['id']);
-        exit();
+        exit;
     } else {
         echo '<div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
             <strong>Fill in all required fields</strong>.
@@ -58,10 +56,18 @@
     exit; 
   }
 
-  if($_SESSION['user_id'] != $row['user_id']){
-    header('Location: home.php');
-    exit;
+  $stmt_verify = $conn->prepare("SELECT user_id FROM `reports` WHERE id = ?");
+  $stmt_verify->bind_param("i", $_GET['id']);
+  $stmt_verify->execute();
+  $result = $stmt_verify->get_result();
+  while ($row = $result->fetch_assoc()) {
+    $user_verify = $row['user_id'];
+    if($_SESSION['user_id'] != $user_verify){
+      header('Location: home.php');
+      exit;
+    }
   }
+
 ?>
 
 <!DOCTYPE html>

@@ -103,7 +103,8 @@
     <!--Container Main start-->
     <div class="height-100 bg-dark" id="main-body" style="color: white">
         <?php
-            $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 20) AS short_description, created, last_updated FROM `reports` WHERE status = 1 ORDER BY last_updated ASC");
+            $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 15) AS short_description, handling_by, created, last_updated FROM `reports` WHERE status = 1 AND handling_by = ? OR handling_by IS NULL ORDER BY last_updated ASC");
+            $stmt->bind_param("i", $_SESSION['user_id']); 
             $stmt->execute();
             $result = $stmt->get_result();
             echo('<table class="table table-dark">
@@ -131,7 +132,7 @@
                         <th scope="row">'. $id .'</th>
                         <td>'. $category .'</td>
                         <td>'. $topic .'</td>
-                        <td>'. $description .' ...</td>
+                        <td>'. $description .'...</td>
                         <td>'. $created .'</td>
                         <td>'. $last_updated .'</td>
                       </tr>');

@@ -62,6 +62,14 @@
     $admin_id = $_SESSION['user_id'];
     $sender_id = $admin_id;
     $message = $_POST['answer'];
+    if (isset($_POST['handling_by'])) {
+        $handling_by = $admin_id;
+    }
+    else {
+        $handling_by = NULL;
+    }
+
+
     if (isset($message) && isset($admin_id)) {
             $errors = array();
 
@@ -76,9 +84,10 @@
                 $stmt->execute();
 
                 $currentTime = date("Y-m-d H:i:s");
+                $status = 0;
 
-                $stmt2 = $conn->prepare("UPDATE `reports` SET last_updated = ?, receiver = $admin_id, status = 0 WHERE id = ?");
-                $stmt2->bind_param("si", $currentTime, $_GET['id']);
+                $stmt2 = $conn->prepare("UPDATE `reports` SET last_updated = ?, receiver = ?, handling_by = ?, status = ? WHERE id = ?");
+                $stmt2->bind_param("siiii", $currentTime, $admin_id, $handling_by, $status, $_GET['id']);
                 $stmt2->execute();
 
                 header('Location: tickets.php');
@@ -162,6 +171,13 @@
                 $status = $row['status'];
                 $description = $row['description'];
                 $created = date("d.m.Y, H:i", strtotime($row['created']));
+                $handling_by = $row['handling_by'];
+                if($handling_by != NULL) { 
+                    $checked = "checked";
+                }
+                else {
+                    $checked = "";
+                }
                 echo('
                 <div class="row p-3 pt-4 mb-5">
                 <div class="col-12 text-center">'. $created .'</div>
@@ -224,6 +240,12 @@
                                     <form class="px-2 py-2 px-md-4 py-md-4" action="ticket_r.php?id='. $_GET['id'] .'" method="POST">
                                         <div class="form-group">
                                             <textarea class="form-control" id="answer_textarea" rows="8" name="answer" id="answer"></textarea>
+                                        </div>
+                                        <div class="form-check text-center pt-3">
+                                            <input class="form-check-input" type="checkbox" name="handling_by" id="handleCheckbox" style="float: none; margin-right: 4px;" '. $checked .'>
+                                            <label class="form-check-label" for="handleCheckbox" style="color: white;">
+                                                I can handle this report.
+                                            </label>
                                         </div>
                                         <div class="text-center">
                                             <button class="btn btn-primary mt-4 signup" type="submit" style="width: 150px;">Answer</button>
