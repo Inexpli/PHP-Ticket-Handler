@@ -6,10 +6,13 @@
 
   if(!isset($_SESSION['username'])){
     header('Location: ../login.php');
+    exit;
   }
 
-  if($_SESSION['staff'] == False) {
+  if(!isset($_SESSION['mod']) && !isset($_SESSION['admin']) && !isset($_SESSION['redirected'])) {
+    $_SESSION['redirected'] = true;
     header('Location: ../home.php');
+    exit;
   }
 ?>
 
@@ -100,7 +103,7 @@
     <!--Container Main start-->
     <div class="height-100 bg-dark" id="main-body" style="color: white">
         <?php
-            $stmt = $conn->prepare("SELECT * FROM `users` WHERE is_staff = 0");
+            $stmt = $conn->prepare("SELECT * FROM `users` WHERE is_mod = 0 AND is_admin = 0");
             $stmt->execute();
             $result = $stmt->get_result();
             echo('<table class="table table-dark">

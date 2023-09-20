@@ -50,12 +50,17 @@
 
   if(!isset($_SESSION['username'])){
     header('Location: login.php');
-    exit(); // Dodaj exit, aby przerwać wykonywanie skryptu
+    exit; 
   }
   
-  if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
+  if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
     header('Location: panel/dashboard.php');
-    exit(); // Dodaj exit, aby przerwać wykonywanie skryptu
+    exit; 
+  }
+
+  if($_SESSION['user_id'] != $row['user_id']){
+    header('Location: home.php');
+    exit;
   }
 ?>
 

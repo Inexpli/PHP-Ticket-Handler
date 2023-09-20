@@ -1,16 +1,18 @@
 <?php
-  session_start();
+session_start();
 
-  define('__ROOT__', dirname(dirname(__FILE__)));
-  require_once(__ROOT__.'\project\config.php');
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'\project\config.php');
 
-  if(!isset($_SESSION['username'])){
-    header('Location: index.php');
-  }
-  
-  if($_SESSION['staff'] == True) {
-    header('Location: panel/dashboard.php');
-  }
+if(!isset($_SESSION['username'])){
+  header('Location: index.php');
+  exit; 
+}
+
+if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
+  header('Location: panel/dashboard.php');
+  exit; 
+}
 ?>
 
 <!DOCTYPE html>

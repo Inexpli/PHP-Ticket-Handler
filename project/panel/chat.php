@@ -6,10 +6,13 @@
 
   if(!isset($_SESSION['username'])){
     header('Location: ../login.php');
+    exit;
   }
 
-  if($_SESSION['staff'] == False) {
+  if(!isset($_SESSION['mod']) && !isset($_SESSION['admin']) && !isset($_SESSION['redirected'])) {
+    $_SESSION['redirected'] = true;
     header('Location: ../home.php');
+    exit;
   }
 ?>
 

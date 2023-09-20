@@ -4,14 +4,14 @@ session_start();
 define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__ . '\project\config.php');
 
-if (isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
+if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
     header('Location: panel/dashboard.php');
-    exit(); // Make sure to exit after redirection
+    exit; 
 }
 
 if (isset($_SESSION['username'])) {
     header('Location: home.php');
-    exit(); // Make sure to exit after redirection
+    exit; 
 }
 ?>
 

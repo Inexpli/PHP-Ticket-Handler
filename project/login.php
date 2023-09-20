@@ -4,12 +4,14 @@ session_start();
 define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__.'\project\config.php');
 
-if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
+if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
   header('Location: panel/dashboard.php');
+  exit; 
 }
 
 if(isset($_SESSION['username'])){
   header('Location: home.php');
+  exit;
 }
 ?>
 
@@ -84,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    $stmt = $conn->prepare("SELECT id, password, is_staff FROM `users` WHERE login = ?");
+    $stmt = $conn->prepare("SELECT id, password, is_mod, is_admin FROM `users` WHERE login = ?");
     $stmt->bind_param("s", $login);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -96,12 +98,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['username'] = $login;
             $_SESSION['user_id'] = $row['id'];
 
-            if ($row['is_staff'] == 1) {
-                $_SESSION['staff'] = True;
-                header('Location: panel/dashboard.php');
-            } else {
-                $_SESSION['staff'] = False;
-                header('Location: home.php');
+            if ($row['is_mod'] == 1) {
+              $_SESSION['mod'] = True;
+              header('Location: panel/dashboard.php');
+            }
+            else if($row['is_admin'] == 1) {
+              $_SESSION['admin'] = True;
+              header('Location: panel/dashboard.php');
+            }
+            else {
+              header('Location: home.php');
             }
         } else {
             echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
@@ -114,8 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <strong>Incorrect login or password</strong>.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>';
-    }
-
-    exit();
+  }
 }
 ?>
