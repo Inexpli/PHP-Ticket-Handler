@@ -85,17 +85,24 @@
         <nav class="nav">
             <div> <a class="nav_logo" href="dashboard.php"> <i class='bx bx-grid-alt nav_logo-icon'></i> <span
                         class="nav_logo-name">Dashboard</span> </a>
-                <div class="nav_list"><a href="clients.php" class="nav_link" id="users"> <i
+                <div class="nav_list">
+                    <?php
+                    if(isset($_SESSION['admin'])) {
+                        echo("
+                        <a href='stats.php' class='nav_link'> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span
+                            class='nav_name'>Statistics</span> </a> 
+                        ");
+                    }
+                    ?>
+                    <a href="clients.php" class="nav_link" id="users"> <i
                             class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a
                         href="tickets.php" class="nav_link active"> <i class='bx bx-message-square-detail nav_icon'></i>
                         <span class="nav_name">Reports</span> </a>
-                        <a href="chat.php" class="nav_link"> <i
-                            class='bx bx-message nav_icon'></i> <span class="nav_name">Chat</span> </a>
                         <a href="#" class="nav_link"> <i
                             class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#"
                         class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span class="nav_name">Files</span> </a>
-                    <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span
-                            class="nav_name">Stats</span> </a> </div>
+                        
+                    </div>
             </div> <a href="../logout.php" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span
                     class="nav_name">Sign out</span> </a>
         </nav>
@@ -103,41 +110,118 @@
     <!--Container Main start-->
     <div class="height-100 bg-dark" id="main-body" style="color: white">
         <?php
-            $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 15) AS short_description, handling_by, created, last_updated FROM `reports` WHERE status = 1 AND handling_by = ? OR handling_by IS NULL ORDER BY last_updated ASC");
-            $stmt->bind_param("i", $_SESSION['user_id']); 
-            $stmt->execute();
-            $result = $stmt->get_result();
-            echo('<table class="table table-dark">
-                <thead>
-                  <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Topic</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Created</th>
-                    <th scope="col">Last updated</th>
-                  </tr>
-                </thead>
-                <tbody>'
-            );
-            while ($row = $result->fetch_assoc()) {
-                $id = $row['id'];
-                $category = $row['category'];
-                $topic = $row['topic'];
-                $description = $row['short_description'];
-                $created = $row['created'];
-                $last_updated = $row['last_updated'];
-                echo('
-                      <tr onclick="redirect('. $id .')" style="cursor: pointer;" class="ticketrow">
+            if(isset($_SESSION['admin'])) {
+                $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 15) AS short_description, handling_by, created, last_updated, status FROM `reports` ORDER BY status DESC");
+                $stmt->execute();
+                $result = $stmt->get_result();
+                echo('<table class="table table-dark">
+                    <thead>
+                      <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Topic</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Handling by</th>
+                        <th scope="col">Created</th>
+                        <th scope="col">Last updated</th>
+                        <th scope="col">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>'
+                );
+                while ($row = $result->fetch_assoc()) {
+                    $id = $row['id'];
+                    $category = $row['category'];
+                    $topic = $row['topic'];
+                    $description = $row['short_description'];
+                    $handling_by = $row['handling_by'];
+                    $created = $row['created'];
+                    $last_updated = $row['last_updated'];
+                    $status = $row['status'];
+                    if($status == True) {
+                        $status = "Answered";
+                    }
+                    else {
+                        $status = "Waiting...";
+                    }
+                    if($row['handling_by'] != NULL) {
+                        echo('
+                        <tr onclick="redirect('. $id .')" style="cursor: pointer;" class="ticketrow">
+                          <th scope="row" style="color: yellow;">'. $id .'</th>
+                          <td style="color: yellow;">'. $category .'</td>
+                          <td style="color: yellow;">'. $topic .'</td>
+                          <td style="color: yellow;">'. $description .'...</td>
+                          <td style="color: yellow;">'. $handling_by .'</td>
+                          <td style="color: yellow;">'. $created .'</td>
+                          <td style="color: yellow;">'. $last_updated .'</td>
+                          <td style="color: yellow;">'. $status .'</td>
+                        </tr>');
+                    } else {
+                    echo('
+                        <tr onclick="redirect('. $id .')" style="cursor: pointer;" class="ticketrow">
+                        <th scope="row">'. $id .'</th>
+                        <td>'. $category .'</td>
+                        <td>'. $topic .'</td>
+                        <td>'. $description .'...</td>
+                        <td>'. $handling_by .'</td>
+                        <td>'. $created .'</td>
+                        <td>'. $last_updated .'</td>
+                        <td>'. $status .'</td>
+                        </tr>');
+                    }
+                }
+                echo('</tbody></table>');
+            }
+            else {
+                $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 15) AS short_description, handling_by, created, last_updated FROM `reports` WHERE status = 1 AND handling_by = ? OR handling_by IS NULL ORDER BY last_updated ASC");
+                $stmt->bind_param("i", $_SESSION['user_id']); 
+                $stmt->execute();
+                $result = $stmt->get_result();
+                echo('<table class="table table-dark">
+                    <thead>
+                      <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Topic</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Created</th>
+                        <th scope="col">Last updated</th>
+                      </tr>
+                    </thead>
+                    <tbody>'
+                );
+                while ($row = $result->fetch_assoc()) {
+                    $id = $row['id'];
+                    $category = $row['category'];
+                    $topic = $row['topic'];
+                    $description = $row['short_description'];
+                    $created = $row['created'];
+                    $last_updated = $row['last_updated'];
+                    if($row['handling_by'] == $_SESSION['user_id']) {
+                        echo('
+                        <tr onclick="redirect('. $id .')" style="cursor: pointer;" class="ticketrow">
+                          <th scope="row" style="color: yellow;">'. $id .'</th>
+                          <td style="color: yellow;">'. $category .'</td>
+                          <td style="color: yellow;">'. $topic .'</td>
+                          <td style="color: yellow;">'. $description .'...</td>
+                          <td style="color: yellow;">'. $created .'</td>
+                          <td style="color: yellow;">'. $last_updated .'</td>
+                        </tr>');
+                    } else {
+                    echo('
+                        <tr onclick="redirect('. $id .')" style="cursor: pointer;" class="ticketrow">
                         <th scope="row">'. $id .'</th>
                         <td>'. $category .'</td>
                         <td>'. $topic .'</td>
                         <td>'. $description .'...</td>
                         <td>'. $created .'</td>
                         <td>'. $last_updated .'</td>
-                      </tr>');
+                        </tr>');
+                    }
+                }
+                echo('</tbody></table>');
             }
-            echo('</tbody></table>');
+
         ?>
     </div>
 

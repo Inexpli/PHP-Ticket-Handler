@@ -14,6 +14,12 @@
     header('Location: ../home.php');
     exit;
   }
+
+  if(!isset($_SESSION['admin']) && !isset($_SESSION['redirected'])) {
+    $_SESSION['redirected'] = true;
+    header('Location: dashboard.php');
+    exit;
+  }
 ?>
 
 <script>
@@ -82,26 +88,95 @@
         <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
     </header>
     <div class="l-navbar" id="nav-bar">
-    <nav class="nav">
+        <nav class="nav">
             <div> <a class="nav_logo" href="dashboard.php"> <i class='bx bx-grid-alt nav_logo-icon'></i> <span
                         class="nav_logo-name">Dashboard</span> </a>
-                <div class="nav_list"><a href="clients.php" class="nav_link" id="users"> <i
+                <div class="nav_list">
+                    <?php
+                    if(isset($_SESSION['admin'])) {
+                        echo("
+                        <a href='stats.php' class='nav_link active'> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span
+                            class='nav_name'>Statistics</span> </a> 
+                        ");
+                    }
+                    ?>
+                    <a href="clients.php" class="nav_link" id="users"> <i
                             class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a
                         href="tickets.php" class="nav_link"> <i class='bx bx-message-square-detail nav_icon'></i>
                         <span class="nav_name">Reports</span> </a>
                         <a href="#" class="nav_link"> <i
                             class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#"
                         class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span class="nav_name">Files</span> </a>
-                    <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span
-                            class="nav_name">Stats</span> </a> </div>
+                        
+                    </div>
             </div> <a href="../logout.php" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span
                     class="nav_name">Sign out</span> </a>
         </nav>
     </div>
     <!--Container Main start-->
     <div class="height-100 bg-dark" id="main-body" style="color: white">
-       
-    </div>
+        <?php
+
+            $stmt = $conn->prepare("SELECT * FROM `statistics`");
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows > 0) {
+                $reports_done = array();
+                $mods = array();
+                while ($row = $result->fetch_assoc()) {
+                    $reports_done[] = $row['reports_done'];
+                    $mod_id = $row['mod_id'];
+                    $stmt2 = $conn->prepare("SELECT * FROM `clientdb` WHERE client_id = ?");
+                    $stmt2->bind_param("i", $mod_id);
+                    $stmt2->execute();
+                    $result2 = $stmt2->get_result();
+                    $first_name = '';
+                    $last_name = '';  
+                    while ($row2 = $result2->fetch_assoc()) {
+                        $first_name = $row2['first_name'];
+                        $last_name = $row2['last_name'];    
+                    }
+                    $mod = $first_name . ' ' . $last_name;
+                    $mods[] = $mod;
+                }
+            unset($result);
+            }
+
+        ?>
+        <div class="row">
+            <div class="col-8">
+                <div>
+                    <canvas id="myChart"></canvas>
+                </div>
+        
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        
+                    <script>
+                        const ctx = document.getElementById('myChart');
+                        const reports_done = <?php echo json_encode($reports_done); ?>;
+                        const mods = <?php echo json_encode($mods); ?>;
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                            labels: mods,
+                            datasets: [{
+                                label: '# of Reports done',
+                                data: reports_done,
+                                borderWidth: 1
+                            }]
+                            },
+                            options: {
+                            scales: {
+                                y: {
+                                beginAtZero: true
+                                }
+                            }
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
