@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Wrz 18, 2023 at 03:31 AM
+-- Generation Time: Wrz 29, 2023 at 05:10 PM
 -- Wersja serwera: 10.4.28-MariaDB
 -- Wersja PHP: 8.2.4
 
@@ -32,7 +32,8 @@ CREATE TABLE `clientdb` (
   `pesel` varchar(11) NOT NULL,
   `client_id` int(12) DEFAULT NULL,
   `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL
+  `last_name` varchar(50) NOT NULL,
+  `added_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -60,11 +61,26 @@ CREATE TABLE `reports` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `receiver` int(11) DEFAULT NULL,
-  `topic` varchar(30) NOT NULL,
+  `category` varchar(30) NOT NULL,
+  `topic` varchar(20) NOT NULL,
   `description` text NOT NULL,
+  `handling_by` int(11) DEFAULT NULL,
   `status` tinyint(1) NOT NULL DEFAULT 1,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_updated` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `statistics`
+--
+
+CREATE TABLE `statistics` (
+  `mod_id` int(11) NOT NULL,
+  `reports_done` int(11) DEFAULT NULL,
+  `reports_handled` int(11) DEFAULT NULL,
+  `clients_added` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -78,7 +94,8 @@ CREATE TABLE `users` (
   `login` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `is_staff` int(1) NOT NULL DEFAULT 0
+  `is_mod` int(1) NOT NULL DEFAULT 0,
+  `is_admin` int(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -90,7 +107,8 @@ CREATE TABLE `users` (
 --
 ALTER TABLE `clientdb`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `client_id` (`client_id`);
+  ADD KEY `client_id` (`client_id`),
+  ADD KEY `addedby` (`added_by`);
 
 --
 -- Indeksy dla tabeli `messages`
@@ -107,7 +125,14 @@ ALTER TABLE `messages`
 ALTER TABLE `reports`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `report_receiver` (`receiver`);
+  ADD KEY `report_receiver` (`receiver`),
+  ADD KEY `handling_by` (`handling_by`);
+
+--
+-- Indeksy dla tabeli `statistics`
+--
+ALTER TABLE `statistics`
+  ADD KEY `mod_id` (`mod_id`);
 
 --
 -- Indeksy dla tabeli `users`
@@ -123,25 +148,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `clientdb`
 --
 ALTER TABLE `clientdb`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
 
 --
 -- AUTO_INCREMENT for table `reports`
 --
 ALTER TABLE `reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
@@ -151,6 +176,7 @@ ALTER TABLE `users`
 -- Constraints for table `clientdb`
 --
 ALTER TABLE `clientdb`
+  ADD CONSTRAINT `addedby` FOREIGN KEY (`added_by`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `clientdb_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
@@ -165,8 +191,15 @@ ALTER TABLE `messages`
 -- Constraints for table `reports`
 --
 ALTER TABLE `reports`
+  ADD CONSTRAINT `handling_by` FOREIGN KEY (`handling_by`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `report_receiver` FOREIGN KEY (`receiver`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `report_sender` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `statistics`
+--
+ALTER TABLE `statistics`
+  ADD CONSTRAINT `mod_id` FOREIGN KEY (`mod_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

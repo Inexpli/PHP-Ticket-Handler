@@ -57,8 +57,39 @@
     });
 </script>
 
+<?php
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'];
+        $mycheck = $_POST['mycheck'];
+    
+        // Sprawdź, czy mycheck to true
+        if ($mycheck === 'true') {
+            $stmt = $conn->prepare("UPDATE `users` SET is_mod = 1 WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+        }
+        else {
+            $stmt = $conn->prepare("UPDATE `users` SET is_mod = 0 WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+        }
+    } 
+    else 
+    {
+        echo 'Invalid request method.';
+    }
+
+?>
+
 <style>
     @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+
+    #savedButton {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
 </style>
 
 <!DOCTYPE html>
@@ -109,6 +140,7 @@
     </div>
     <!--Container Main start-->
     <div class="height-100 bg-dark" id="main-body" style="color: white">
+        <form action="dashboard.php" method="POST">
         <?php
             if(isset($_SESSION['admin'])) {
                 $stmt = $conn->prepare("SELECT * FROM `users` WHERE is_admin = 0 ORDER BY is_mod DESC");
@@ -123,6 +155,7 @@
                         <th scope="col">PESEL</th>
                         <th scope="col">Login</th>
                         <th scope="col">Email</th>
+                        <th scope="col">Moderator</th>
                     </tr>
                     </thead>
                     <tbody>'
@@ -132,6 +165,12 @@
                     $login = $row['login'];
                     $email = $row['email'];
                     $is_mod = $row['is_mod'];
+                    if($is_mod == 1) {
+                        $checked = "checked";
+                    }
+                    else {
+                        $checked = "";
+                    }
                     $stmt2 = $conn->prepare("SELECT * FROM `clientdb` WHERE client_id = ?");
                     $stmt2->bind_param("i", $id);
                     $stmt2->execute();
@@ -150,6 +189,11 @@
                                 <td style="color: yellow;">'. $pesel .'</td>
                                 <td style="color: yellow;">'. $login .'</td>
                                 <td style="color: yellow;">'. $email .'</td>
+                                <td style="color: yellow;">
+                                <div class="form-check">
+                                <input class="form-check-input" id="modCheckbox'.$id.'" type="checkbox" name="mod"'. $checked .' onclick="toUpdate('. $id .')">
+                                </div>
+                                </td>
                             </tr>');
                     }
                     else {
@@ -161,6 +205,11 @@
                                 <td>'. $pesel .'</td>
                                 <td>'. $login .'</td>
                                 <td>'. $email .'</td>
+                                <td>
+                                <div class="form-check">
+                                <input class="form-check-input" id="modCheckbox'.$id.'" type="checkbox" name="mod"'. $checked .' onclick="toUpdate('. $id .')">
+                                </div>
+                                </td>
                             </tr>');
                     }
                 }
@@ -209,10 +258,70 @@
                 echo('</tbody></table>');
             }
         ?>
+            <button class="btn btn-primary m-4" style="display:none; position: fixed; bottom: 15px; right: 15px;" id="saved">Saved...</button>
+        </form>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+
+    function handleCheckboxChange() {
+
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+
+      let hasChanges = false;
+
+
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked !== checkbox.defaultChecked) {
+          hasChanges = true;
+        }
+      });
+
+      const savedBtn = document.getElementById('saved');
+      if (hasChanges) {
+      setTimeout(() => {
+        savedBtn.style.display = 'block';
+      }, 300);
+      savedBtn.style.opacity = 1;
+
+      setTimeout(() => {
+        savedBtn.style.opacity = 0;
+        setTimeout(() => {
+          savedBtn.style.display = 'none';
+        }, 300);
+
+        location.reload();
+      }, 2000);
+        } else {
+        savedBtn.style.opacity = 0;
+        setTimeout(() => {
+            savedBtn.style.display = 'none';
+        }, 300);
+        }
+    }
+
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', handleCheckboxChange);
+    });
+
+    function toUpdate(id) {
+        const mycheck = document.getElementById(`modCheckbox${id}`).checked;
+
+        fetch('dashboard.php', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        body: `id=${id}&mycheck=${mycheck}`,
+        })
+        .then(response => response.text());
+    }
+  </script>
 </body>
 
 </html>
