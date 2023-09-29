@@ -173,7 +173,7 @@
                 echo('</tbody></table>');
             }
             else {
-                $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 15) AS short_description, handling_by, created, last_updated FROM `reports` WHERE status = 1 AND handling_by = ? OR handling_by IS NULL ORDER BY last_updated ASC");
+                $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 15) AS short_description, handling_by, created, last_updated, status FROM `reports` WHERE status = 1 AND (handling_by = ? OR handling_by IS NULL) ORDER BY last_updated ASC;");
                 $stmt->bind_param("i", $_SESSION['user_id']); 
                 $stmt->execute();
                 $result = $stmt->get_result();
