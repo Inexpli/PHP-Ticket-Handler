@@ -63,22 +63,25 @@
         $id = $_POST['id'];
         $mycheck = $_POST['mycheck'];
     
-        // Sprawdź, czy mycheck to true
         if ($mycheck === 'true') {
             $stmt = $conn->prepare("UPDATE `users` SET is_mod = 1 WHERE id = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
+
+            $stmt2 = $conn->prepare("INSERT INTO `statistics` (mod_id,reports_done,reports_handled,clients_added) VALUES (?,0,0,0)");
+            $stmt2->bind_param("i", $id);
+            $stmt2->execute();
         }
         else {
             $stmt = $conn->prepare("UPDATE `users` SET is_mod = 0 WHERE id = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
+
+            $stmt2 = $conn->prepare("DELETE FROM `statistics` WHERE mod_id = ?");
+            $stmt2->bind_param("i", $id);
+            $stmt2->execute();
         }
     } 
-    else 
-    {
-        echo 'Invalid request method.';
-    }
 
 ?>
 
@@ -140,6 +143,21 @@
     </div>
     <!--Container Main start-->
     <div class="height-100 bg-dark" id="main-body" style="color: white">
+    <div class="row pb-4 pt-3">
+        <div class="col-5"></div>
+        <div class="col-5">
+        </div>
+        <div class="col-2" style="max-width: 300px;">
+            <div class="content">
+                <form action="" method="POST">
+                    <div class="input-group">
+                        <input class="form-control" name="search" placeholder="Enter PESEL">
+                        <button class="btn btn-primary" type="submit" name="submit">Search</button>
+                    </div>
+                <form>
+            </div>
+        </div>
+    </div>
         <form action="dashboard.php" method="POST">
         <?php
             if(isset($_SESSION['admin'])) {

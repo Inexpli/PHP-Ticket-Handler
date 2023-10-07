@@ -125,6 +125,8 @@
                 $mods = array();
                 while ($row = $result->fetch_assoc()) {
                     $reports_done[] = $row['reports_done'];
+                    $reports_handled[] = $row['reports_handled'];
+                    $clients_added[] = $row['clients_added'];
                     $mod_id = $row['mod_id'];
                     $stmt2 = $conn->prepare("SELECT * FROM `clientdb` WHERE client_id = ?");
                     $stmt2->bind_param("i", $mod_id);
@@ -143,40 +145,140 @@
             }
 
         ?>
-        <div class="row">
-            <div class="col-8">
+        <div class="row pt-5 pb-5">
+            <div class="col-6">
                 <div>
-                    <canvas id="myChart"></canvas>
+                    <canvas id="reports"></canvas>
                 </div>
-        
-                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        
-                    <script>
-                        const ctx = document.getElementById('myChart');
-                        const reports_done = <?php echo json_encode($reports_done); ?>;
-                        const mods = <?php echo json_encode($mods); ?>;
-                        new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                            labels: mods,
-                            datasets: [{
-                                label: '# of Reports done',
-                                data: reports_done,
-                                borderWidth: 1
-                            }]
-                            },
-                            options: {
-                            scales: {
-                                y: {
-                                beginAtZero: true
-                                }
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+                <script>
+                    const rtx = document.getElementById('reports');
+                    const reports_done = <?php echo json_encode($reports_done); ?>;
+                    const mods = <?php echo json_encode($mods); ?>;
+                    new Chart(rtx, {
+                        type: 'bar',
+                        data: {
+                        labels: mods,
+                        datasets: [{
+                            label: '# of Reports done',
+                            data: reports_done,
+                            borderWidth: 1,
+                            borderColor: ['#4723D9'],
+                        }]
+                        },
+                        options: {
+                        scales: {
+                            y: {
+                            beginAtZero: true
                             }
-                            }
-                        });
-                    </script>
+                        }
+                        }
+                    });
+                </script>
+            </div>
+            <div class="col-6">
+                <div>
+                    <canvas id="handled"></canvas>
                 </div>
+                <script>
+                    const htx = document.getElementById('handled');
+                    const reports_handled = <?php echo json_encode($reports_handled); ?>;
+                    new Chart(htx, {
+                        type: 'bar',
+                        data: {
+                        labels: mods,
+                        datasets: [{
+                            label: '# of Reports handled',
+                            data: reports_handled,
+                            borderWidth: 1,
+                            borderColor: ['#4723D9'],
+                        }]
+                        },
+                        options: {
+                        scales: {
+                            y: {
+                            beginAtZero: true
+                            }
+                        }
+                        }
+                    });
+                </script>
             </div>
         </div>
+        <div class="row pt-5">
+            <div class="col-6">
+                <div>
+                    <canvas id="clients"></canvas>
+                </div>
+    
+                <script>
+                    const ctx = document.getElementById('clients');
+                    const clients_added = <?php echo json_encode($clients_added); ?>;
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                        labels: mods,
+                        datasets: [{
+                            label: '# of Clients added',
+                            data: clients_added,
+                            borderWidth: 1,
+                            borderColor: ['#4723D9'],
+                        }]
+                        },
+                        options: {
+                        scales: {
+                            y: {
+                            beginAtZero: true
+                            }
+                        }
+                        }
+                    });
+                </script>
+            </div>
+            <div class="col-6">
+                <div>
+                    <canvas id="all"></canvas>
+                </div>
+    
+                <script>
+                    const atx = document.getElementById('all');
+                    new Chart(atx, {
+                        type: 'bar',
+                        data: {
+                        labels: mods,
+                        datasets: [{
+                            label: '# of Reports done',
+                            data: reports_done,
+                            borderWidth: 1,
+                            borderColor: ['aqua'],
+                        }, 
+                        {
+                            label: '# of Reports handled',
+                            data: reports_handled,
+                            borderWidth: 1,
+                            borderColor: ['blue'],
+                        },
+                        {
+                            label: '# of Clients added',
+                            data: clients_added,
+                            borderWidth: 1,
+                            borderColor: ['purple'],
+                        }
+                    ]
+                        },
+                        options: {
+                        scales: {
+                            y: {
+                            beginAtZero: true
+                            }
+                        }
+                        }
+                    });
+                </script>
+            </div>
+        </div>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>

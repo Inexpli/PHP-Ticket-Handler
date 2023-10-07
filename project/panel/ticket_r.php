@@ -57,74 +57,6 @@
     });
 </script>
 
-<?php
-  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $admin_id = $_SESSION['user_id'];
-    $sender_id = $admin_id;
-    $message = $_POST['answer'];
-    if (isset($_POST['handling_by'])) {
-        $handling_by = $admin_id;
-    }
-    else {
-        $handling_by = NULL;
-    }
-
-
-    if (isset($message) && isset($admin_id)) {
-            $errors = array();
-
-            if (strlen($message) < 20) {
-                $errors[] = "Answer is too short, give more details.";
-            }
-
-            if (empty($errors)) {
-
-                $stmt = $conn->prepare("INSERT INTO `messages` (message, sender_id, admin_id, report_id) VALUES(?,?,?,?)");
-                $stmt->bind_param("siii", $message, $sender_id, $admin_id, $_GET['id']);
-                $stmt->execute();
-
-                $currentTime = date("Y-m-d H:i:s");
-                $status = 0;
-
-                $stmt2 = $conn->prepare("UPDATE `reports` SET last_updated = ?, receiver = ?, handling_by = ?, status = ? WHERE id = ?");
-                $stmt2->bind_param("siiii", $currentTime, $admin_id, $handling_by, $status, $_GET['id']);
-                $stmt2->execute();
-                
-                if($handling_by != NULL) {
-                    $stmt3 = $conn->prepare("UPDATE `statistics` SET reports_done = reports_done + 1, reports_handled = reports_handled + 1 WHERE mod_id = ?");
-                    $stmt3->bind_param("i", $_SESSION['user_id']);
-                    $stmt3->execute();
-                }
-                else {
-                    $stmt3 = $conn->prepare("UPDATE `statistics` SET reports_done = reports_done + 1 WHERE mod_id = ?");
-                    $stmt3->bind_param("i", $_SESSION['user_id']);
-                    $stmt3->execute();
-                }
-
-                header('Location: tickets.php');
-
-            } else {
-                // Display error messages
-                foreach ($errors as $error) {
-                    echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
-                    <strong>' . $error . '</strong>.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>';
-                }
-            }
-        } 
-
-        else {
-            echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
-            <strong>You cannot send empty answer.</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
-        }
-
-    exit();
-}
-?>
-
 <style>
     @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
 </style>
@@ -251,8 +183,8 @@
             echo('
             <div class="row no-gutter">
                 <div class="col-md-12">
-                    <div class="login d-flex align-items-center py-5">
-                        <div class="container-fluid mt-5 mb-5">
+                    <div class="login d-flex align-items-center pt-5">
+                        <div class="container-fluid mt-5 mb-3">
                             <div class="row d-flex align-items-center justify-content-center">
                                 <div class="col-12 col-sm-10 col-md-9 col-lg-7 col-xl-6">
                                     <form class="px-2 py-2 px-md-4 py-md-4" action="ticket_r.php?id='. $_GET['id'] .'" method="POST">
@@ -285,3 +217,60 @@
 </body>
 
 </html>
+
+
+<?php
+  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $admin_id = $_SESSION['user_id'];
+    $sender_id = $admin_id;
+    $message = $_POST['answer'];
+    if (isset($_POST['handling_by'])) {
+        $handling_by = $admin_id;
+    }
+    else {
+        $handling_by = NULL;
+    }
+
+
+    if (isset($message) && isset($admin_id)) {
+        $errors = array();
+
+        if (strlen($message) < 20) {
+            echo('
+                <div class="row text-center d-flex align-items-center justify-content-center pb-3">
+                    <div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
+                    <strong>Answer is too short, give more details.</strong>.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>');
+            echo("<script> window.scrollTo(0, document.body.scrollHeight); </script>");
+        }
+        else {
+            $stmt = $conn->prepare("INSERT INTO `messages` (message, sender_id, admin_id, report_id) VALUES(?,?,?,?)");
+            $stmt->bind_param("siii", $message, $sender_id, $admin_id, $_GET['id']);
+            $stmt->execute();
+
+            $currentTime = date("Y-m-d H:i:s");
+            $status = 0;
+
+            $stmt2 = $conn->prepare("UPDATE `reports` SET last_updated = ?, receiver = ?, handling_by = ?, status = ? WHERE id = ?");
+            $stmt2->bind_param("siiii", $currentTime, $admin_id, $handling_by, $status, $_GET['id']);
+            $stmt2->execute();
+            
+            if($handling_by != NULL) {
+                $stmt3 = $conn->prepare("UPDATE `statistics` SET reports_done = reports_done + 1, reports_handled = reports_handled + 1 WHERE mod_id = ?");
+                $stmt3->bind_param("i", $_SESSION['user_id']);
+                $stmt3->execute();
+            }
+            else {
+                $stmt3 = $conn->prepare("UPDATE `statistics` SET reports_done = reports_done + 1 WHERE mod_id = ?");
+                $stmt3->bind_param("i", $_SESSION['user_id']);
+                $stmt3->execute();
+            }
+
+            header('Location: tickets.php');
+        }
+    }
+    exit();
+}
+?>
