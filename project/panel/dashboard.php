@@ -59,7 +59,7 @@
 
 <?php
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !(isset($_POST['search']))) {
         $id = $_POST['id'];
         $mycheck = $_POST['mycheck'];
     
@@ -76,13 +76,13 @@
             $stmt = $conn->prepare("UPDATE `users` SET is_mod = 0 WHERE id = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
-
+            
             $stmt2 = $conn->prepare("DELETE FROM `statistics` WHERE mod_id = ?");
             $stmt2->bind_param("i", $id);
             $stmt2->execute();
         }
-    } 
-
+    }  
+    
 ?>
 
 <style>
@@ -109,6 +109,8 @@
     <!-- Bootstrap Icons CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 
 <body id="body-pd" style="background-color: #212529;">
@@ -149,10 +151,11 @@
         </div>
         <div class="col-2" style="max-width: 300px;">
             <div class="content">
-                <form action="" method="POST">
+                <form action="dashboard.php" method="POST">
                     <div class="input-group">
-                        <input class="form-control" name="search" placeholder="Enter PESEL">
-                        <button class="btn btn-primary" type="submit" name="submit">Search</button>
+                        <input class="form-control" type="number" name="pesel" id="pesel" placeholder="Enter PESEL">
+                        <button class="btn btn-primary" type="submit" name="search"><i
+                            class='bx bx-search-alt nav_icon'></i></button>
                     </div>
                 <form>
             </div>
@@ -160,7 +163,91 @@
     </div>
         <form action="dashboard.php" method="POST">
         <?php
-            if(isset($_SESSION['admin'])) {
+            if(isset($_SESSION['admin']) && (isset($_POST['search']))) {
+
+                if (($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['search']))) {
+                    $pesel = $_POST['pesel'];
+
+                    echo('<table class="table table-dark">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">First name</th>
+                        <th scope="col">Last name</th>
+                        <th scope="col">PESEL</th>
+                        <th scope="col">Login</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Moderator</th>
+                    </tr>
+                    </thead>
+                    <tbody>');
+                
+                    if (!empty($pesel)) {
+                        $stmt = $conn->prepare("SELECT * FROM `clientdb` WHERE pesel = ?");
+                        $stmt->bind_param("i", $pesel);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        while ($row = $result->fetch_assoc()) {
+                            $user_id = $row['client_id'];
+                            $pesel = $row['pesel'];
+                            $first_name = $row['first_name'];
+                            $last_name = $row['last_name'];
+
+                            $stmt2 = $conn->prepare("SELECT * from `users` WHERE id = ?");
+                            $stmt2->bind_param("i", $user_id);
+                            $stmt2->execute();
+                            $result2 = $stmt2->get_result();
+                            while ($row2 = $result2->fetch_assoc()) {
+                                $id = $row2['id'];
+                                $login = $row2['login'];
+                                $email = $row2['email'];
+                                $is_mod = $row2['is_mod'];
+                                if($is_mod == 1) {
+                                    $checked = "checked";
+                                }
+                                else {
+                                    $checked = "";
+                                }
+                            }
+                            if($is_mod == 1) {
+                                echo('
+                                    <tr>
+                                        <th scope="row" style="color: yellow;">'. $id .'</th>
+                                        <td style="color: yellow;">'. $first_name .'</td>
+                                        <td style="color: yellow;">'. $last_name .'</td>
+                                        <td style="color: yellow;">'. $pesel .'</td>
+                                        <td style="color: yellow;">'. $login .'</td>
+                                        <td style="color: yellow;">'. $email .'</td>
+                                        <td style="color: yellow;">
+                                        <div class="form-check">
+                                        <input class="form-check-input" id="modCheckbox'.$id.'" type="checkbox" name="mod"'. $checked .' onclick="toUpdate('. $id .')">
+                                        </div>
+                                        </td>
+                                    </tr>');
+                            }
+                            else {
+                                echo('
+                                    <tr>
+                                        <th scope="row">'. $id .'</th>
+                                        <td>'. $first_name .'</td>
+                                        <td>'. $last_name .'</td>
+                                        <td>'. $pesel .'</td>
+                                        <td>'. $login .'</td>
+                                        <td>'. $email .'</td>
+                                        <td>
+                                        <div class="form-check">
+                                        <input class="form-check-input" id="modCheckbox'.$id.'" type="checkbox" name="mod"'. $checked .' onclick="toUpdate('. $id .')">
+                                        </div>
+                                        </td>
+                                    </tr>');
+                            }
+                        }
+                        echo('</tbody></table>');
+                    }
+                }
+            }
+            
+            else if(isset($_SESSION['admin'])) {
                 $stmt = $conn->prepare("SELECT * FROM `users` WHERE is_admin = 0 ORDER BY is_mod DESC");
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -234,6 +321,62 @@
                 echo('</tbody></table>');
             }
             else {
+                if((($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['search'])))) {
+                    $pesel = $_POST['pesel'];
+
+                    echo('<table class="table table-dark">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">First name</th>
+                        <th scope="col">Last name</th>
+                        <th scope="col">PESEL</th>
+                        <th scope="col">Login</th>
+                        <th scope="col">Email</th>
+                    </tr>
+                    </thead>
+                    <tbody>'
+                    );
+                
+                    if (!empty($pesel)) {
+                        $stmt = $conn->prepare("SELECT * FROM `clientdb` WHERE pesel = ?");
+                        $stmt->bind_param("i", $pesel);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        while ($row = $result->fetch_assoc()) {
+                            $user_id = $row['client_id'];
+                            $pesel = $row['pesel'];
+                            $first_name = $row['first_name'];
+                            $last_name = $row['last_name'];
+
+                            $stmt2 = $conn->prepare("SELECT * from `users` WHERE id = ?");
+                            $stmt2->bind_param("i", $user_id);
+                            $stmt2->execute();
+                            $result2 = $stmt2->get_result();
+                            while ($row2 = $result2->fetch_assoc()) {
+                                $id = $row2['id'];
+                                $login = $row2['login'];
+                                $email = $row2['email'];
+                                $is_mod = $row2['is_mod'];
+                                $is_admin = $row2['is_admin'];
+                            }
+                            if(($is_mod != 1)&&($is_admin != 1)) {
+                                echo('
+                                <tr>
+                                    <th scope="row">'. $id .'</th>
+                                    <td>'. $first_name .'</td>
+                                    <td>'. $last_name .'</td>
+                                    <td>'. $pesel .'</td>
+                                    <td>'. $login .'</td>
+                                    <td>'. $email .'</td>
+                                </tr>');
+                            }
+                        }
+                        echo('</tbody></table>');
+                    }
+                }
+                else 
+                {
                 $stmt = $conn->prepare("SELECT * FROM `users` WHERE is_mod = 0 AND is_admin = 0");
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -274,6 +417,7 @@
                         </tr>');
                 }
                 echo('</tbody></table>');
+                }
             }
         ?>
             <button class="btn btn-primary m-4" style="display:none; position: fixed; bottom: 15px; right: 15px;" id="saved">Saved...</button>
@@ -342,4 +486,14 @@
   </script>
 </body>
 
+<script>
+$('#pesel').keydown(function(e) {
+    if (this.value.length > 10) 
+        if ( !(e.which == '46' || e.which == '8' || e.which == '13') ) // backspace/enter/del
+            e.preventDefault();
+});
+</script>
+
 </html>
+
+
