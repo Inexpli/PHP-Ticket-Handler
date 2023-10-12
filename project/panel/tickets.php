@@ -98,7 +98,7 @@
                             class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a
                         href="tickets.php" class="nav_link active"> <i class='bx bx-message-square-detail nav_icon'></i>
                         <span class="nav_name">Reports</span> </a>
-                        <a href="#" class="nav_link"> <i
+                        <a href="formulas.php" class="nav_link"> <i
                             class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#"
                         class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span class="nav_name">Files</span> </a>
                         
@@ -108,7 +108,7 @@
         </nav>
     </div>
     <!--Container Main start-->
-    <div class="height-100 bg-dark" id="main-body" style="color: white">
+    <div class="height-90 bg-dark" id="main-body" style="color: white">
         <?php
             if(isset($_SESSION['admin'])) {
                 $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 15) AS short_description, handling_by, created, last_updated, status FROM `reports` ORDER BY status DESC");

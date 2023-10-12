@@ -134,7 +134,7 @@
                             class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a
                         href="tickets.php" class="nav_link"> <i class='bx bx-message-square-detail nav_icon'></i>
                         <span class="nav_name">Reports</span> </a>
-                        <a href="#" class="nav_link"> <i
+                        <a href="formulas.php" class="nav_link"> <i
                             class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Formulas</span> </a> <a href="#"
                         class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span class="nav_name">Files</span> </a>
                         
@@ -144,7 +144,7 @@
         </nav>
     </div>
     <!--Container Main start-->
-    <div class="height-100 bg-dark" id="main-body" style="color: white">
+    <div class="height-90 bg-dark" id="main-body" style="color: white">
     <div class="row pb-4 pt-3">
         <div class="col-5"></div>
         <div class="col-5">

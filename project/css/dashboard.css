@@ -437,3 +437,12 @@ a {
     border-radius: 0.525rem;
 }
 
+.p-card {
+    border: 2px solid #4723D9;
+    border-radius: 0.525rem;
+    min-height: 100px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    cursor: pointer;
+}
