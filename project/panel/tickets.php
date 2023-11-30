@@ -111,10 +111,10 @@
     <div class="height-90 bg-dark" id="main-body" style="color: white">
         <?php
             if(isset($_SESSION['admin'])) {
-                $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 15) AS short_description, handling_by, created, last_updated, status FROM `reports` ORDER BY status DESC");
+                $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING(description, 1, 50) AS short_description, handling_by, created, last_updated, status FROM `reports` ORDER BY status DESC");
                 $stmt->execute();
                 $result = $stmt->get_result();
-                echo('<table class="table table-dark">
+                echo('<table class="table table-dark text-center">
                     <thead>
                       <tr>
                         <th scope="col">ID</th>
@@ -135,8 +135,8 @@
                     $topic = $row['topic'];
                     $description = $row['short_description'];
                     $handling_by = $row['handling_by'];
-                    $created = $row['created'];
-                    $last_updated = $row['last_updated'];
+                    $created = date("d.m.Y, H:i", strtotime($row['created']));
+                    $last_updated = date("d.m.Y, H:i", strtotime($row['last_updated']));
                     $status = $row['status'];
                     if($status == True) {
                         $status = "Answered";
@@ -173,11 +173,11 @@
                 echo('</tbody></table>');
             }
             else {
-                $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING_INDEX(description, ' ', 15) AS short_description, handling_by, created, last_updated, status FROM `reports` WHERE status = 1 AND (handling_by = ? OR handling_by IS NULL) ORDER BY last_updated ASC;");
+                $stmt = $conn->prepare("SELECT id, category, topic, SUBSTRING(description, 1, 50) AS short_description, handling_by, created, last_updated, status FROM `reports` WHERE status = 1 AND (handling_by = ? OR handling_by IS NULL) ORDER BY last_updated ASC;");
                 $stmt->bind_param("i", $_SESSION['user_id']); 
                 $stmt->execute();
                 $result = $stmt->get_result();
-                echo('<table class="table table-dark">
+                echo('<table class="table table-dark text-center">
                     <thead>
                       <tr>
                         <th scope="col">ID</th>
@@ -195,8 +195,8 @@
                     $category = $row['category'];
                     $topic = $row['topic'];
                     $description = $row['short_description'];
-                    $created = $row['created'];
-                    $last_updated = $row['last_updated'];
+                    $created = date("d.m.Y, H:i", strtotime($row['created']));
+                    $last_updated = date("d.m.Y, H:i", strtotime($row['last_updated']));
                     if($row['handling_by'] == $_SESSION['user_id']) {
                         echo('
                         <tr onclick="redirect('. $id .')" style="cursor: pointer;" class="ticketrow">

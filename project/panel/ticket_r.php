@@ -134,12 +134,13 @@
                 <div class="col-12 text-center">'. $category .'</div>
                 <div class="col-12 pb-4 text-center">'. $topic .'</div>
                 </div>
-                <div class="col-6">
-                  <div class="bubble p-2" style="word-wrap: break-word; display: inline-block;">
-                  '. $description .'<br><br><div class="text-start">'. $created .'</div>
-                  </div>
-                </div>
-                <div class="col-6"></div>'
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <div class="bubble p-2" style="word-wrap: break-word;">
+                        '. $description .'<br><br><div class="text-start">'. $created .'</div>
+                        </div>
+                    </div>
+                </div>'
                 );
 
                 $stmt2 = $conn->prepare("SELECT * FROM `messages` WHERE report_id = ?");
@@ -170,7 +171,7 @@
                       <div class="row">
                       <div class="col-6"></div>
                       <div class="col-6">
-                      <div class="bubble p-2" style="display: inline-block; word-wrap: break-word; float:right; margin-bottom: 1px;">
+                      <div class="bubble p-2" style="word-wrap: break-word; margin-bottom: 1px;">
                       '. $message .'<br><br><div class="text-end">'. $created2 .'</div>
                       </div>
                       </div>

@@ -164,7 +164,6 @@
         <form action="dashboard.php" method="POST">
         <?php
             if(isset($_SESSION['admin']) && (isset($_POST['search']))) {
-
                 if (($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['search']))) {
                     $pesel = $_POST['pesel'];
 
