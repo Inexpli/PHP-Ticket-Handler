@@ -1,7 +1,9 @@
 <?php
   session_start();
+  // Importing config
   require_once "config.php";
 
+  // Ticket system
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $message = $_POST['message'];
     if (isset($message)) {
@@ -46,16 +48,18 @@
     }
   }
 
+  // Checking if the user is logged in, otherwise he will be redirected to the login page
   if(!isset($_SESSION['username'])){
     header('Location: login.php');
     exit; 
   }
-  
+  // If the user does not have sufficient permissions, he is redirected to home
   if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
     header('Location: panel/dashboard.php');
     exit; 
   }
 
+  // If the report does not belong to the user, he is redirected to home page
   $stmt_verify = $conn->prepare("SELECT user_id FROM `reports` WHERE id = ?");
   $stmt_verify->bind_param("i", $_GET['id']);
   $stmt_verify->execute();
@@ -106,6 +110,7 @@
     <div class="height-100" id="main-body">
       <div class="ticket p-2 mb-5 p-sm-0">
         <?php
+          // Corespondention between user and admin in user view
             $stmt = $conn->prepare("SELECT * FROM `reports` WHERE id = ?");
             $stmt->bind_param("i", $_GET['id']);
             $stmt->execute();

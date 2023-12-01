@@ -1,14 +1,14 @@
 <?php
   session_start();
-
+  // Importing config
   define('__ROOT__', dirname(dirname(__FILE__)));
   require_once(__ROOT__.'\config.php');
-
+  // Checking if the user is logged in, otherwise he will be redirected to the login page
   if(!isset($_SESSION['username'])){
     header('Location: ../login.php');
     exit;
   }
-
+  // If the user does not have sufficient permissions, he is redirected to home
   if(!isset($_SESSION['mod']) && !isset($_SESSION['admin']) && !isset($_SESSION['redirected'])) {
     $_SESSION['redirected'] = true;
     header('Location: ../home.php');
@@ -17,44 +17,44 @@
 ?>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function(event) {
-   
-   const showNavbar = (toggleId, navId, bodyId, headerId) =>{
-   const toggle = document.getElementById(toggleId),
-   nav = document.getElementById(navId),
-   bodypd = document.getElementById(bodyId),
-   headerpd = document.getElementById(headerId)
-   
-   // Validate that all variables exist
-   if(toggle && nav && bodypd && headerpd){
-   toggle.addEventListener('click', ()=>{
-   // show navbar
-   nav.classList.toggle('show')
-   // change icon
-   toggle.classList.toggle('bx-x')
-   // add padding to body
-   bodypd.classList.toggle('body-pd')
-   // add padding to header
-   headerpd.classList.toggle('body-pd')
-   })
-   }
-   }
-   
-   showNavbar('header-toggle','nav-bar','body-pd','header')
-   
-   /*===== LINK ACTIVE =====*/
-   const linkColor = document.querySelectorAll('.nav_link')
-   
-   function colorLink(){
-   if(linkColor){
-   linkColor.forEach(l=> l.classList.remove('active'))
-   this.classList.add('active')
-   }
-   }
-   linkColor.forEach(l=> l.addEventListener('click', colorLink))
-   
-    // Your code to run since DOM is loaded and ready
-});
+    document.addEventListener("DOMContentLoaded", function (event) {
+
+        const showNavbar = (toggleId, navId, bodyId, headerId) => {
+            const toggle = document.getElementById(toggleId),
+                nav = document.getElementById(navId),
+                bodypd = document.getElementById(bodyId),
+                headerpd = document.getElementById(headerId)
+
+            // Validating if all variables exist
+            if (toggle && nav && bodypd && headerpd) {
+                toggle.addEventListener('click', () => {
+                    // Show navbar
+                    nav.classList.toggle('show')
+                    // Change icon
+                    toggle.classList.toggle('bx-x')
+                    // Add padding to body
+                    bodypd.classList.toggle('body-pd')
+                    // Add padding to header
+                    headerpd.classList.toggle('body-pd')
+                })
+            }
+        }
+
+        showNavbar('header-toggle', 'nav-bar', 'body-pd', 'header')
+
+        /*===== LINK ACTIVE =====*/
+        const linkColor = document.querySelectorAll('.nav_link')
+
+        function colorLink() {
+            if (linkColor) {
+                linkColor.forEach(l => l.classList.remove('active'))
+                this.classList.add('active')
+            }
+        }
+        linkColor.forEach(l => l.addEventListener('click', colorLink))
+
+        // Code to run since DOM is loaded and ready
+    });
 </script>
 
 <!DOCTYPE html>
@@ -139,6 +139,7 @@
 </body>
 
 <script>
+// Limiting the number of input digits
 $('#pesel').keydown(function(e) {
     if (this.value.length > 10) 
         if ( !(e.which == '46' || e.which == '8' || e.which == '13') ) // backspace/enter/del
@@ -153,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $pesel = $_POST['pesel'];
 
     if(isset($firstname) && isset($lastname) && isset($pesel)) {
-        // Prepare statements for validation
+        // Preparing statements for validation
         $pesel_stmt = $conn->prepare("SELECT * FROM clientdb WHERE pesel = ?");
         $pesel_stmt->bind_param("s", $pesel);
         $pesel_stmt->execute();

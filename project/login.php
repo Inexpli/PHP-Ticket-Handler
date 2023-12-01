@@ -1,18 +1,18 @@
 <?php
-session_start();
-
-define('__ROOT__', dirname(dirname(__FILE__)));
-require_once(__ROOT__.'\project\config.php');
-
-if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
-  header('Location: panel/dashboard.php');
-  exit; 
-}
-
-if(isset($_SESSION['username'])){
-  header('Location: home.php');
-  exit;
-}
+  session_start();
+  // Importing config
+  define('__ROOT__', dirname(dirname(__FILE__)));
+  require_once(__ROOT__.'\project\config.php');
+  // If user has moderator or admin rights, he is redirected to the dashboard
+  if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
+    header('Location: panel/dashboard.php');
+    exit; 
+  }
+  // If user is logged in, he will be redirected to the home page
+  if(isset($_SESSION['username'])){
+    header('Location: home.php');
+    exit;
+  }
 ?>
 
 <!doctype html>
@@ -77,7 +77,7 @@ if(isset($_SESSION['username'])){
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $login = $_POST['login'];
     $password = $_POST['password'];
-    
+    // Validating input
     if (empty($login) || empty($password)) {
         echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
             <strong>Fill in empty fields</strong>.
@@ -90,22 +90,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("s", $login);
     $stmt->execute();
     $result = $stmt->get_result();
-
+    // Checks if exists in database
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-
+        // Password verification
         if (password_verify($password, $row['password'])) {
             $_SESSION['username'] = $login;
             $_SESSION['user_id'] = $row['id'];
-
+            // If moderator redirect to dashboard and set as moderator
             if ($row['is_mod'] == 1) {
               $_SESSION['mod'] = True;
               header('Location: panel/dashboard.php');
             }
+            // If administrator redirect to dashboard and set as administrator
             else if($row['is_admin'] == 1) {
               $_SESSION['admin'] = True;
               header('Location: panel/dashboard.php');
             }
+            // If user redirect to home page
             else {
               header('Location: home.php');
             }

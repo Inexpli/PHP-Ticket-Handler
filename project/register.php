@@ -1,18 +1,18 @@
 <?php
-session_start();
-
-define('__ROOT__', dirname(dirname(__FILE__)));
-require_once(__ROOT__ . '\project\config.php');
-
-if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
+  session_start();
+  // Importing config
+  define('__ROOT__', dirname(dirname(__FILE__)));
+  require_once(__ROOT__.'\project\config.php');
+  // If user has moderator or admin rights, he is redirected to the dashboard
+  if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
     header('Location: panel/dashboard.php');
     exit; 
-}
-
-if (isset($_SESSION['username'])) {
+  }
+  // If user is logged in, he will be redirected to the home page
+  if(isset($_SESSION['username'])){
     header('Location: home.php');
-    exit; 
-}
+    exit;
+  }
 ?>
 
 <!doctype html>
@@ -78,6 +78,7 @@ if (isset($_SESSION['username'])) {
 </html>
 
 <script>
+// Limiting the number of input digits
 $('#pesel').keydown(function(e) {
     if (this.value.length > 10) 
         if ( !(e.which == '46' || e.which == '8' || e.which == '13') ) // backspace/enter/del
@@ -96,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password1 = $_POST['password'];
     $password2 = $_POST['password_r'];
     $epassword = password_hash($password1, PASSWORD_DEFAULT);
-
+    // Validating input
     if (isset($login) && isset($email) && isset($pesel) && isset($password1) && isset($password2)) {
         // Prepare statements for validation
         $login_stmt = $conn->prepare("SELECT * FROM users WHERE login = ?");

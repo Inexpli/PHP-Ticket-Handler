@@ -1,14 +1,14 @@
 <?php
   session_start();
-
+  // Importing config
   define('__ROOT__', dirname(dirname(__FILE__)));
   require_once(__ROOT__.'\config.php');
-
+  // Checking if the user is logged in, otherwise he will be redirected to the login page
   if(!isset($_SESSION['username'])){
     header('Location: ../login.php');
     exit;
   }
-
+  // If the user does not have sufficient permissions, he is redirected to home
   if(!isset($_SESSION['mod']) && !isset($_SESSION['admin']) && !isset($_SESSION['redirected'])) {
     $_SESSION['redirected'] = true;
     header('Location: ../home.php');
@@ -25,16 +25,16 @@
                 bodypd = document.getElementById(bodyId),
                 headerpd = document.getElementById(headerId)
 
-            // Validate that all variables exist
+            // Validating if all variables exist
             if (toggle && nav && bodypd && headerpd) {
                 toggle.addEventListener('click', () => {
-                    // show navbar
+                    // Show navbar
                     nav.classList.toggle('show')
-                    // change icon
+                    // Change icon
                     toggle.classList.toggle('bx-x')
-                    // add padding to body
+                    // Add padding to body
                     bodypd.classList.toggle('body-pd')
-                    // add padding to header
+                    // Add padding to header
                     headerpd.classList.toggle('body-pd')
                 })
             }
@@ -53,12 +53,12 @@
         }
         linkColor.forEach(l => l.addEventListener('click', colorLink))
 
-        // Your code to run since DOM is loaded and ready
+        // Code to run since DOM is loaded and ready
     });
 </script>
 
 <?php
-
+    // Search bar
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && !(isset($_POST['search']))) {
         $id = $_POST['id'];
         $mycheck = $_POST['mycheck'];
@@ -163,7 +163,9 @@
     </div>
         <form action="dashboard.php" method="POST">
         <?php
-            if(isset($_SESSION['admin']) && (isset($_POST['search']))) {
+            // Search bar behaviour depending on user permission
+            if(isset($_SESSION['admin']) && (isset($_POST['search']))) 
+            {
                 if (($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['search']))) {
                     $pesel = $_POST['pesel'];
 
@@ -245,8 +247,8 @@
                     }
                 }
             }
-            
-            else if(isset($_SESSION['admin'])) {
+            else if(isset($_SESSION['admin'])) 
+            {
                 $stmt = $conn->prepare("SELECT * FROM `users` WHERE is_admin = 0 ORDER BY is_mod DESC");
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -319,7 +321,8 @@
                 }
                 echo('</tbody></table>');
             }
-            else {
+            else 
+            {
                 if((($_SERVER['REQUEST_METHOD'] === 'POST') && (isset($_POST['search'])))) {
                     $pesel = $_POST['pesel'];
 
@@ -427,7 +430,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-
+    // Permission change script
     function handleCheckboxChange() {
 
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -486,6 +489,7 @@
 </body>
 
 <script>
+// Limiting the number of input digits
 $('#pesel').keydown(function(e) {
     if (this.value.length > 10) 
         if ( !(e.which == '46' || e.which == '8' || e.which == '13') ) // backspace/enter/del

@@ -1,15 +1,14 @@
 <?php
   session_start();
-
+  // Importing config
   define('__ROOT__', dirname(dirname(__FILE__)));
-
   require_once(__ROOT__.'\project\config.php');
-
+  // If user has moderator or admin rights, he is redirected to the dashboard
   if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
     header('Location: panel/dashboard.php');
     exit; 
   }
-
+  // If user is logged in, he is redirected to the home page
   if(isset($_SESSION['username'])){
     header('Location: home.php');
     exit;

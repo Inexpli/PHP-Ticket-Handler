@@ -1,14 +1,14 @@
 <?php
   session_start();
-
+  // Importing config
   define('__ROOT__', dirname(dirname(__FILE__)));
   require_once(__ROOT__.'\config.php');
-
+  // Checking if the user is logged in, otherwise he will be redirected to the login page
   if(!isset($_SESSION['username'])){
     header('Location: ../login.php');
     exit;
   }
-
+  // If the user does not have sufficient permissions, he is redirected to home
   if(!isset($_SESSION['mod']) && !isset($_SESSION['admin']) && !isset($_SESSION['redirected'])) {
     $_SESSION['redirected'] = true;
     header('Location: ../home.php');
@@ -25,16 +25,16 @@
                 bodypd = document.getElementById(bodyId),
                 headerpd = document.getElementById(headerId)
 
-            // Validate that all variables exist
+            // Validating if all variables exist
             if (toggle && nav && bodypd && headerpd) {
                 toggle.addEventListener('click', () => {
-                    // show navbar
+                    // Show navbar
                     nav.classList.toggle('show')
-                    // change icon
+                    // Change icon
                     toggle.classList.toggle('bx-x')
-                    // add padding to body
+                    // Add padding to body
                     bodypd.classList.toggle('body-pd')
-                    // add padding to header
+                    // Add padding to header
                     headerpd.classList.toggle('body-pd')
                 })
             }
@@ -53,7 +53,7 @@
         }
         linkColor.forEach(l => l.addEventListener('click', colorLink))
 
-        // Your code to run since DOM is loaded and ready
+        // Code to run since DOM is loaded and ready
     });
 </script>
 
@@ -234,7 +234,6 @@
 
 
     if (isset($message) && isset($admin_id)) {
-        $errors = array();
 
         if (strlen($message) < 20) {
             echo('
@@ -251,13 +250,14 @@
             $stmt->bind_param("siii", $message, $sender_id, $admin_id, $_GET['id']);
             $stmt->execute();
 
-            $currentTime = date("Y-m-d H:i:s");
+            $currentTime = date("Y.m.d H:i:s");
             $status = 0;
 
             $stmt2 = $conn->prepare("UPDATE `reports` SET last_updated = ?, receiver = ?, handling_by = ?, status = ? WHERE id = ?");
             $stmt2->bind_param("siiii", $currentTime, $admin_id, $handling_by, $status, $_GET['id']);
             $stmt2->execute();
             
+            // Adding statistics depending on action
             if($handling_by != NULL) {
                 $stmt3 = $conn->prepare("UPDATE `statistics` SET reports_done = reports_done + 1, reports_handled = reports_handled + 1 WHERE mod_id = ?");
                 $stmt3->bind_param("i", $_SESSION['user_id']);

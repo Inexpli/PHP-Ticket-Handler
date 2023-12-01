@@ -1,7 +1,8 @@
 <?php
   session_start();
+  // Importing config
   require_once "config.php";
-
+  // If user is logged in, he will be redirected to the home page
   if(!isset($_SESSION['username'])){
     header('Location: login.php');
     exit;

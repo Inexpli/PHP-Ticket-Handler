@@ -1,20 +1,20 @@
 <?php
   session_start();
-
+  // Importing config
   define('__ROOT__', dirname(dirname(__FILE__)));
   require_once(__ROOT__.'\config.php');
-
+  // Checking if the user is logged in, otherwise he will be redirected to the login page
   if(!isset($_SESSION['username'])){
     header('Location: ../login.php');
     exit;
   }
-
+  // If the user does not have sufficient permissions, he is redirected to home
   if(!isset($_SESSION['mod']) && !isset($_SESSION['admin']) && !isset($_SESSION['redirected'])) {
     $_SESSION['redirected'] = true;
     header('Location: ../home.php');
     exit;
   }
-
+  // If the user does not have administrator rights, he is redirected to the home page
   if(!isset($_SESSION['admin']) && !isset($_SESSION['redirected'])) {
     $_SESSION['redirected'] = true;
     header('Location: dashboard.php');
@@ -31,16 +31,16 @@
                 bodypd = document.getElementById(bodyId),
                 headerpd = document.getElementById(headerId)
 
-            // Validate that all variables exist
+            // Validating if all variables exist
             if (toggle && nav && bodypd && headerpd) {
                 toggle.addEventListener('click', () => {
-                    // show navbar
+                    // Show navbar
                     nav.classList.toggle('show')
-                    // change icon
+                    // Change icon
                     toggle.classList.toggle('bx-x')
-                    // add padding to body
+                    // Add padding to body
                     bodypd.classList.toggle('body-pd')
-                    // add padding to header
+                    // Add padding to header
                     headerpd.classList.toggle('body-pd')
                 })
             }
@@ -59,7 +59,7 @@
         }
         linkColor.forEach(l => l.addEventListener('click', colorLink))
 
-        // Your code to run since DOM is loaded and ready
+        // Code to run since DOM is loaded and ready
     });
 </script>
 
@@ -116,7 +116,7 @@
     <!--Container Main start-->
     <div class="height-90 bg-dark" id="main-body" style="color: white">
         <?php
-
+            // Loading statistics
             $stmt = $conn->prepare("SELECT * FROM `statistics`");
             $stmt->execute();
             $result = $stmt->get_result();
@@ -146,12 +146,13 @@
 
         ?>
         <div class="row pt-5 pb-5">
+            <!-- Reports done statistics -->
             <div class="col-6">
                 <div>
                     <canvas id="reports"></canvas>
                 </div>
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
                 <script>
                     const rtx = document.getElementById('reports');
                     const reports_done = <?php echo json_encode($reports_done); ?>;
@@ -177,6 +178,7 @@
                     });
                 </script>
             </div>
+            <!-- Reports handled statistics -->
             <div class="col-6">
                 <div>
                     <canvas id="handled"></canvas>
@@ -206,6 +208,7 @@
                 </script>
             </div>
         </div>
+        <!-- Clients added statistics -->
         <div class="row pt-5">
             <div class="col-6">
                 <div>
@@ -236,6 +239,7 @@
                     });
                 </script>
             </div>
+            <!-- All statistics -->
             <div class="col-6">
                 <div>
                     <canvas id="all"></canvas>

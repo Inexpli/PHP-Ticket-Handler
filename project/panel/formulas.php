@@ -1,14 +1,14 @@
 <?php
   session_start();
-
+  // Importing config
   define('__ROOT__', dirname(dirname(__FILE__)));
   require_once(__ROOT__.'\config.php');
-
+  // Checking if the user is logged in, otherwise he will be redirected to the login page
   if(!isset($_SESSION['username'])){
     header('Location: ../login.php');
     exit;
   }
-
+  // If the user does not have sufficient permissions, he is redirected to home
   if(!isset($_SESSION['mod']) && !isset($_SESSION['admin']) && !isset($_SESSION['redirected'])) {
     $_SESSION['redirected'] = true;
     header('Location: ../home.php');
@@ -18,7 +18,6 @@
 
 
 <script>
-    // Navbar script
     document.addEventListener("DOMContentLoaded", function (event) {
 
         const showNavbar = (toggleId, navId, bodyId, headerId) => {
@@ -27,16 +26,16 @@
                 bodypd = document.getElementById(bodyId),
                 headerpd = document.getElementById(headerId)
 
-            // Validate that all variables exist
+            // Validating if all variables exist
             if (toggle && nav && bodypd && headerpd) {
                 toggle.addEventListener('click', () => {
-                    // show navbar
+                    // Show navbar
                     nav.classList.toggle('show')
-                    // change icon
+                    // Change icon
                     toggle.classList.toggle('bx-x')
-                    // add padding to body
+                    // Add padding to body
                     bodypd.classList.toggle('body-pd')
-                    // add padding to header
+                    // Add padding to header
                     headerpd.classList.toggle('body-pd')
                 })
             }
@@ -55,7 +54,7 @@
         }
         linkColor.forEach(l => l.addEventListener('click', colorLink))
 
-        // Your code to run since DOM is loaded and ready
+        // Code to run since DOM is loaded and ready
     });
 </script>
 
@@ -187,6 +186,7 @@
 </body>
 
 <script>
+// Limiting the number of input digits
 $('#pesel').keydown(function(e) {
     if (this.value.length > 10) 
         if ( !(e.which == '46' || e.which == '8' || e.which == '13') ) // backspace/enter/del

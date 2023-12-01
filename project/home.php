@@ -1,18 +1,18 @@
 <?php
-session_start();
-
-define('__ROOT__', dirname(dirname(__FILE__)));
-require_once(__ROOT__.'\project\config.php');
-
-if(!isset($_SESSION['username'])){
-  header('Location: index.php');
-  exit; 
-}
-
-if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
-  header('Location: panel/dashboard.php');
-  exit; 
-}
+  session_start();
+  // Importing config
+  define('__ROOT__', dirname(dirname(__FILE__)));
+  require_once(__ROOT__.'\project\config.php');
+  // Checking if the user is logged in, otherwise he will be redirected to the login page
+  if(!isset($_SESSION['username'])){
+    header('Location: index.php');
+    exit; 
+  }
+  // If user has moderator or admin rights, he is redirected to the dashboard
+  if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
+    header('Location: panel/dashboard.php');
+    exit; 
+  }
 ?>
 
 <!DOCTYPE html>
