@@ -13,6 +13,20 @@
     header('Location: home.php');
     exit;
   }
+  session_start();
+  // Importing config
+  define('__ROOT__', dirname(dirname(__FILE__)));
+  require_once(__ROOT__.'\project\config.php');
+  // If user has moderator or admin rights, he is redirected to the dashboard
+  if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
+    header('Location: panel/dashboard.php');
+    exit; 
+  }
+  // If user is logged in, he will be redirected to the home page
+  if(isset($_SESSION['username'])){
+    header('Location: home.php');
+    exit;
+  }
 ?>
 
 <!doctype html>
@@ -25,9 +39,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/main.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
     <!-- Bootstrap Icons CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <!-- JQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   </head>
@@ -53,6 +71,7 @@
                                     <input class="form-control" type="text" placeholder="Email" aria-label="email input" name="email">
                                 </div>
                                 <div class="form-input pb-2">
+                                    <input class="form-control" type="number" placeholder="Pesel" aria-label="pesel input" name="pesel" maxlength="11" id="pesel">
                                     <input class="form-control" type="number" placeholder="Pesel" aria-label="pesel input" name="pesel" maxlength="11" id="pesel">
                                 </div>
                                 <div class="form-input pb-2">
@@ -86,6 +105,19 @@ $('#pesel').keydown(function(e) {
 });
 </script>
 
+<script>
+// Limiting the number of input digits
+$('#pesel').keydown(function(e) {
+    if (this.value.length > 10) 
+        if ( !(e.which == '46' || e.which == '8' || e.which == '13') ) // backspace/enter/del
+            e.preventDefault();
+});
+</script>
+
+<?php 
+
+$errors = array(); // Initialize the errors array
+
 <?php 
 
 $errors = array(); // Initialize the errors array
@@ -97,6 +129,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password1 = $_POST['password'];
     $password2 = $_POST['password_r'];
     $epassword = password_hash($password1, PASSWORD_DEFAULT);
+    // Validating input
+    if (isset($login) && isset($email) && isset($pesel) && isset($password1) && isset($password2)) {
     // Validating input
     if (isset($login) && isset($email) && isset($pesel) && isset($password1) && isset($password2)) {
         // Prepare statements for validation
@@ -119,8 +153,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         if (count(array_filter($_POST)) != count($_POST)) {
             $errors[] = "• Fill in all fields";
+        // Validation checks...
+        
+        if (count(array_filter($_POST)) != count($_POST)) {
+            $errors[] = "• Fill in all fields";
         }
         // Other validation checks...
+        else {
+            if (mysqli_num_rows($login_result) > 0) {
+                $errors[] = "• This username already exists";
+            }
+            if (strlen($login) < 3) {
+                $errors[] = "• Username has to be longer than 2 characters";
+            }
+            if (mysqli_num_rows($email_result) > 0) {
+                $errors[] = "• This email is already taken";
+            }
+            if (mysqli_num_rows($pesel_result) <= 0) {
+                $errors[] = "• Client with this pesel doesn't exist, consider pesel validation";
+            }
         else {
             if (mysqli_num_rows($login_result) > 0) {
                 $errors[] = "• This username already exists";
