@@ -153,8 +153,8 @@
 	<div class="container">
 		<div class="row">
 
-			<div class="col-0 col-xl-3"></div>
-			<div class="col-12 col-xl-6 bg-dark" id="main-body" style="color: white;">
+			<div class="col-0 col-xl-2"></div>
+			<div class="col-12 col-xl-8 bg-dark" id="main-body" style="color: white;">
 				<?php
 					$stmt = $conn->prepare("SELECT * FROM `reports` WHERE id = ?");
 					$stmt->bind_param("i", $_GET['id']);
@@ -169,10 +169,10 @@
 						$created = date("d.m.Y, H:i", strtotime($row['created']));
 						$handling_by = $row['handling_by'];
 						if($handling_by != NULL) {
-								$checked = "checked";
+							$checked = "checked";
 						}
 						else {
-								$checked = "";
+							$checked = "";
 						}
 						echo('
 						<div class="row p-3 pt-4 mb-5">
@@ -181,7 +181,7 @@
 						<div class="col-12 pb-4 text-center">'. $topic .'</div>
 						</div>
 						<div class="row pb-4">
-								<div class="col-6 text-end">
+								<div class="col-6">
 										<div class="bubble p-2" style="word-wrap: break-word; display: inline-block; margin-bottom: 1px;">
 										'. $description .'<br><br><div class="text-start">'. $created .'</div>
 										</div>
@@ -204,7 +204,7 @@
 								if($sender == $user_id) {
 									echo('
 									<div class="row pb-4">
-									<div class="col-6 text-end">
+									<div class="col-6">
 									<div class="bubble p-2" style="word-wrap: break-word; display: inline-block; margin-bottom: 1px;">
 									'. $message .'<br><br><div class="text-start">'. $created2 .'</div>
 									</div>
@@ -214,9 +214,9 @@
 								}
 								else {
 									echo('
-									<div class="row pb-4">
+									<div class="row text-end pb-4">
 									<div class="col-6"></div>
-									<div class="col-6 text-start">
+									<div class="col-6">
 									<div class="bubble p-2" style="display: inline-block; word-wrap: break-word; word-break: break-word; margin-bottom: 1px;">
 									'. $message .'<br><br><div class="text-end">'. $created2 .'</div>
 									</div>
@@ -258,7 +258,7 @@
 					echo('</div>');
 				?>
 			</div>
-			<div class="col-0 col-xl-3"></div>
+			<div class="col-0 col-xl-2"></div>
 		</div>
 	</div>
 

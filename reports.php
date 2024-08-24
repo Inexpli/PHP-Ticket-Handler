@@ -132,9 +132,9 @@
     function setCookie(name, value, days) {
         var expires = "";
         if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
         }
         document.cookie = name + "=" + (value || "") + expires + "; path=/";
     }
@@ -143,9 +143,9 @@
         var nameEQ = name + "=";
         var ca = document.cookie.split(';');
         for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
         }
         return null;
     }
@@ -155,32 +155,34 @@
         const value = moonButton.getAttribute('value') === 'true'; 
         moonButton.setAttribute('value', !value);
         
+        // Update theme depending on button press
         var element = document.body;
         element.dataset.bsTheme = element.dataset.bsTheme == "light" ? "dark" : "light";
 
-        // Zaktualizuj klasę CSS na podstawie nowego motywu
+        // Update button css class depending on theme
         if(value) {
             moonButton.className = "btn btn-outline-primary bi bi-moon-stars";
         } else {
             moonButton.className = "btn btn-outline-primary bi bi-moon-stars-fill";
         }
 
-        // Zaktualizuj ciasteczko 'darkmode'
+        // Update cookie 'darkmode'
         setCookie('darkmode', !value, 30);
     }
 
-    // Ustaw motyw na podstawie ciasteczka przy załadowaniu strony
+    // Update theme depending on cookie value
     window.onload = function() {
-        const darkMode = getCookie('darkmode') === 'true';
-        const moonButton = document.getElementById('moon');
+        const darkMode = getCookie("darkmode") === "true";
+        const moonButton = document.getElementById("moon");
         moonButton.setAttribute('value', darkMode);
         
         var element = document.body;
         element.dataset.bsTheme = darkMode ? "dark" : "light";
 
-        // Ustaw klasę CSS przycisku na podstawie ciasteczka
+        // Update button css class depending on theme
         if(darkMode) {
             moonButton.className = "btn btn-outline-primary bi bi-moon-stars-fill";
+
         } else {
             moonButton.className = "btn btn-outline-primary bi bi-moon-stars";
         }

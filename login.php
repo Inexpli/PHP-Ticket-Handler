@@ -140,23 +140,24 @@
     }
 
     function themeMode() {
+      // Update theme depending on button press
       var element = document.body;
       element.dataset.bsTheme = element.dataset.bsTheme == "light" ? "dark" : "light";
 
-      // Zaktualizuj klasę CSS na podstawie nowego motywu
+      // Update button css class depending on theme
       if(value) {
         moonButton.className = "btn btn-outline-primary bi bi-moon-stars";
       } else {
         moonButton.className = "btn btn-outline-primary bi bi-moon-stars-fill";
       }
 
-      // Zaktualizuj ciasteczko 'darkmode'
+      // Update cookie 'darkmode'
       setCookie('darkmode', !value, 30);
     }
 
-    // Ustaw motyw na podstawie ciasteczka przy załadowaniu strony
+    // Update theme depending on cookie value
     window.onload = function() {
-      const darkMode = getCookie('darkmode') === 'true';
+      const darkMode = getCookie("darkmode") === "true";
       
       var element = document.body;
       element.dataset.bsTheme = darkMode ? "dark" : "light";
