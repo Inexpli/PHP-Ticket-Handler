@@ -1,24 +1,23 @@
 <?php
-  session_start();
-  // Importing config
-  require_once "config.php";
-  // If user is logged in, he will be redirected to the home page
-  if(!isset($_SESSION['username'])){
-    header('Location: login.php');
-    exit;
-  }
-  
-  if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
-    header('Location: panel/dashboard.php');
-    exit; 
-  }
+    session_start();
+    // Importing config
+    require_once "config.php";
+    // If user is logged in, he will be redirected to the home page
+        if(!isset($_SESSION['username'])){
+        header('Location: login.php');
+        exit;
+    }
+    
+    if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
+        header('Location: panel/dashboard.php');
+        exit; 
+    }
 ?>
 
 <style>
-
-.btn-ticket {
-    min-width: 80px !important;
-}
+    .btn-ticket {
+        min-width: 80px !important;
+    }
 </style>
 
 <!DOCTYPE html>
@@ -38,22 +37,22 @@
 <body>
 <div class="container">
     <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-      <div class="col-md-0 col-lg-3 mb-2 mb-md-0">
-      </div>
+        <div class="col-md-0 col-lg-3 mb-2 mb-md-0">
+        </div>
 
-      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-        <li><a href="home.php" class="nav-link px-2 text-p">Home</a></li>
-        <li><a href="#" class="nav-link px-2 text-p">Features</a></li>
-        <li><a href="#" class="nav-link px-2 text-p">Pricing</a></li>
-        <li><a href="#" class="nav-link px-2 text-p">FAQs</a></li>
-        <li><a href="#" class="nav-link px-2 text-p link-secondary">Reports</a></li>
-        <li><a href="#" class="nav-link px-2 text-p">About</a></li>
-      </ul>
+        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+            <li><a href="home.php" class="nav-link px-2 text-p">Home</a></li>
+            <li><a href="#" class="nav-link px-2 text-p">Features</a></li>
+            <li><a href="#" class="nav-link px-2 text-p">Pricing</a></li>
+            <li><a href="#" class="nav-link px-2 text-p">FAQs</a></li>
+            <li><a href="#" class="nav-link px-2 text-p link-secondary">Reports</a></li>
+            <li><a href="#" class="nav-link px-2 text-p">About</a></li>
+        </ul>
 
-      <div class="col-md-3 text-end">
-        <button type="button" class="btn btn-primary me-2" onclick="document.location.href='logout.php';">Logout</button>
-        <i class="btn btn-outline-primary bi bi-moon-stars" value="False" id="moon" style="float: right; padding: 10px 12px;" onclick="themeMode()"></i>
-      </div>
+        <div class="col-md-3 text-end">
+            <button type="button" class="btn btn-primary me-2" onclick="document.location.href='logout.php';">Logout</button>
+            <i class="btn btn-outline-primary bi bi-moon-stars" value="False" id="moon" style="float: right; padding: 10px 12px;" onclick="themeMode()"></i>
+        </div>
     </header>
     <div class="row no-gutter">
         <div class="col-md-12">
@@ -128,113 +127,110 @@
             </div>
         </div>
     </div>
-  </div>
-  <script>
+</div>
+<script>
     function setCookie(name, value, days) {
-      var expires = "";
-      if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toUTCString();
-      }
-      document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
     }
 
     function getCookie(name) {
-      var nameEQ = name + "=";
-      var ca = document.cookie.split(';');
-      for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-      }
-      return null;
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
     }
 
     function themeMode() {
-      const moonButton = document.getElementById('moon');
-      const value = moonButton.getAttribute('value') === 'true'; 
-      moonButton.setAttribute('value', !value);
-      
-      var element = document.body;
-      element.dataset.bsTheme = element.dataset.bsTheme == "light" ? "dark" : "light";
+        const moonButton = document.getElementById('moon');
+        const value = moonButton.getAttribute('value') === 'true'; 
+        moonButton.setAttribute('value', !value);
+        
+        var element = document.body;
+        element.dataset.bsTheme = element.dataset.bsTheme == "light" ? "dark" : "light";
 
-      // Zaktualizuj klasę CSS na podstawie nowego motywu
-      if(value) {
-        moonButton.className = "btn btn-outline-primary bi bi-moon-stars";
-      } else {
-        moonButton.className = "btn btn-outline-primary bi bi-moon-stars-fill";
-      }
+        // Zaktualizuj klasę CSS na podstawie nowego motywu
+        if(value) {
+            moonButton.className = "btn btn-outline-primary bi bi-moon-stars";
+        } else {
+            moonButton.className = "btn btn-outline-primary bi bi-moon-stars-fill";
+        }
 
-      // Zaktualizuj ciasteczko 'darkmode'
-      setCookie('darkmode', !value, 30);
+        // Zaktualizuj ciasteczko 'darkmode'
+        setCookie('darkmode', !value, 30);
     }
 
     // Ustaw motyw na podstawie ciasteczka przy załadowaniu strony
     window.onload = function() {
-      const darkMode = getCookie('darkmode') === 'true';
-      const moonButton = document.getElementById('moon');
-      moonButton.setAttribute('value', darkMode);
-      
-      var element = document.body;
-      element.dataset.bsTheme = darkMode ? "dark" : "light";
+        const darkMode = getCookie('darkmode') === 'true';
+        const moonButton = document.getElementById('moon');
+        moonButton.setAttribute('value', darkMode);
+        
+        var element = document.body;
+        element.dataset.bsTheme = darkMode ? "dark" : "light";
 
-      // Ustaw klasę CSS przycisku na podstawie ciasteczka
-      if(darkMode) {
-        moonButton.className = "btn btn-outline-primary bi bi-moon-stars-fill";
-      } else {
-        moonButton.className = "btn btn-outline-primary bi bi-moon-stars";
-      }
+        // Ustaw klasę CSS przycisku na podstawie ciasteczka
+        if(darkMode) {
+            moonButton.className = "btn btn-outline-primary bi bi-moon-stars-fill";
+        } else {
+            moonButton.className = "btn btn-outline-primary bi bi-moon-stars";
+        }
     };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
 <?php
-  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $category = $_POST['category'];
     $topic = $_POST['topic'];
     $description = $_POST['description'];
     if (isset($topic) && isset($description)) {
-            $errors = array();
-
-            if (empty($topic) || $category == "Category") {
-                $errors[] = "Invalid topic.";
-            }
-
-            if (strlen($description) < 20) {
-                $errors[] = "Description is too short, give more details.";
-            }
-
-            if (empty($errors)) {
-
-                date_default_timezone_set('Europe/Warsaw');
-
-                $stmt = $conn->prepare("INSERT INTO `reports` (user_id, category, topic, description, status, created, last_updated) VALUES (?, ?, ?, ?, 1, date('d-m-Y, H:i'), date('d-m-Y, H:i'))");
-                $stmt->bind_param("isss", $_SESSION['user_id'], $category, $topic, $description);
-                $stmt->execute();
-                
-                echo '<meta http-equiv="refresh" content="0">';
-
-            } else {
-                // Display error messages
-                foreach ($errors as $error) {
-                    echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
-                    <strong>' . $error . '</strong>.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>';
-                }
-            }
-        } 
-
-        else {
-            echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
-            <strong>Fill in all required fields</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
+        $errors = array();
+        if (empty($topic) || $category == "Category") {
+            $errors[] = "Invalid topic.";
         }
 
+        if (strlen($description) < 20) {
+            $errors[] = "Description is too short, give more details.";
+        }
+
+        if (empty($errors)) {
+
+            date_default_timezone_set('Europe/Warsaw');
+
+            $stmt = $conn->prepare("INSERT INTO `reports` (user_id, category, topic, description, status, created, last_updated) VALUES (?, ?, ?, ?, 1, date('d-m-Y, H:i'), date('d-m-Y, H:i'))");
+            $stmt->bind_param("isss", $_SESSION['user_id'], $category, $topic, $description);
+            $stmt->execute();
+            
+            echo '<meta http-equiv="refresh" content="0">';
+
+        } else {
+            // Display error messages
+            foreach ($errors as $error) {
+                echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
+                <strong>' . $error . '</strong>.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>';
+            }
+        }
+    } 
+    else {
+        echo '<div class="alert alert-fixed alert-danger alert-dismissible fade show text-center" role="alert">
+        <strong>Fill in all required fields</strong>.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>';
+    }
     exit();
 }
 ?>
