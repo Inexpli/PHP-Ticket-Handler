@@ -1,15 +1,65 @@
 <?php
   session_start();
-
+  // Importing config
   define('__ROOT__', dirname(dirname(__FILE__)));
   require_once(__ROOT__.'\project\config.php');
 
-  if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
-    header('Location: dashboard.php');
+  // Redirect logic
+  if((isset($_SESSION['mod']) && $_SESSION['mod'] == true) || (isset($_SESSION['admin']) && $_SESSION['admin'] == true)) {
+    header('Location: panel/dashboard.php');
+    exit; 
   }
-
   if(isset($_SESSION['username'])){
     header('Location: home.php');
+    exit;
+  }
+
+  // Process login form submission
+  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+      $login = $_POST['login'];
+      $password = $_POST['password'];
+      // Validating input
+      if (empty($login) || empty($password)) {
+          echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+              <strong>Fill in empty fields</strong>.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
+      } else {
+          $stmt = $conn->prepare("SELECT id, password, is_mod, is_admin FROM `users` WHERE login = ?");
+          $stmt->bind_param("s", $login);
+          $stmt->execute();
+          $result = $stmt->get_result();
+          // Checks if exists in database
+          if ($result->num_rows > 0) {
+              $row = $result->fetch_assoc();
+              // Password verification
+              if (password_verify($password, $row['password'])) {
+                  $_SESSION['username'] = $login;
+                  $_SESSION['user_id'] = $row['id'];
+                  // Redirect based on role
+                  if ($row['is_mod'] == 1) {
+                    $_SESSION['mod'] = true;
+                    header('Location: panel/dashboard.php');
+                  } else if($row['is_admin'] == 1) {
+                    $_SESSION['admin'] = true;
+                    header('Location: panel/dashboard.php');
+                  } else {
+                    header('Location: home.php');
+                  }
+                  exit; // Ensure the script stops after the redirect
+              } else {
+                  echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                      <strong>Incorrect login or password</strong>.
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>';
+              }
+          } else {
+              echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                  <strong>Incorrect login or password</strong>.
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>';
+          }
+      }
   }
 ?>
 
@@ -18,15 +68,14 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/main.css">
-    <script src="js/script.js"></script>
     <title>Login</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
     <!-- Bootstrap Icons CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" rel="stylesheet">
 </head>
   <body>
     <div class="container-fluid">
@@ -68,47 +117,52 @@
           </div>
       </div>
   </div>
+  <script>
+    function setCookie(name, value, days) {
+      var expires = "";
+      if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+      var nameEQ = name + "=";
+      var ca = document.cookie.split(';');
+      for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    }
+
+    function themeMode() {
+      var element = document.body;
+      element.dataset.bsTheme = element.dataset.bsTheme == "light" ? "dark" : "light";
+
+      // Zaktualizuj klasę CSS na podstawie nowego motywu
+      if(value) {
+        moonButton.className = "btn btn-outline-primary bi bi-moon-stars";
+      } else {
+        moonButton.className = "btn btn-outline-primary bi bi-moon-stars-fill";
+      }
+
+      // Zaktualizuj ciasteczko 'darkmode'
+      setCookie('darkmode', !value, 30);
+    }
+
+    // Ustaw motyw na podstawie ciasteczka przy załadowaniu strony
+    window.onload = function() {
+      const darkMode = getCookie('darkmode') === 'true';
+      
+      var element = document.body;
+      element.dataset.bsTheme = darkMode ? "dark" : "light";
+    };
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
-<?php
-  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $login = $_POST['login'];
-    $password = $_POST['password'];
-    
-    if (empty($login) || empty($password)) {
-      echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-        <strong>Fill in empty fields</strong>.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
-      exit();
-    }
-  
-    $stmt = $conn->prepare("SELECT id, password, is_staff FROM `users` WHERE login = ?");
-    $stmt->bind_param("s", $login);
-    $stmt->execute();
-    $result = $stmt->get_result();
 
-    while ($row = $result->fetch_assoc()) {
-      if (password_verify($password, $row['password'])) {
-        $_SESSION['username'] = $login;
-        $_SESSION['user_id'] = $row['id'];
-
-        if ($row['is_staff'] == 1) {
-          $_SESSION['staff'] = True;
-          header('Location: dashboard.php');
-        } 
-        else {
-          $_SESSION['staff'] = False;
-          header('Location: home.php');
-        }
-      } else {
-        echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-          <strong>Incorrect email or password</strong>.
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>';
-      }
-    }
-  }
-  exit();
-?>

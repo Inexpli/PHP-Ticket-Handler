@@ -1,14 +1,18 @@
 <?php
-    session_start();
-    require_once "config.php";
-
-    if(isset($_SESSION['staff']) && $_SESSION['staff'] == True) {
-        header('Location: dashboard.php');
-    }
-
-    if(isset($_SESSION['username'])){
-        header('Location: home.php');
-    }
+  session_start();
+  // Importing config
+  define('__ROOT__', dirname(dirname(__FILE__)));
+  require_once(__ROOT__.'\project\config.php');
+  // If user has moderator or admin rights, he is redirected to the dashboard
+  if((isset($_SESSION['mod']) && $_SESSION['mod'] == True) || (isset($_SESSION['admin']) && $_SESSION['admin'] == True)) {
+    header('Location: panel/dashboard.php');
+    exit; 
+  }
+  // If user is logged in, he will be redirected to the home page
+  if(isset($_SESSION['username'])){
+    header('Location: home.php');
+    exit;
+  }
 ?>
 
 <!doctype html>
@@ -16,15 +20,16 @@
   <head>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/main.css">
-    <script src="js/script.js"></script>
     <title>Register</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
     <!-- Bootstrap Icons CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" rel="stylesheet">
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   </head>
 <body>
 <div class="container-fluid">
@@ -48,7 +53,7 @@
                                     <input class="form-control" type="text" placeholder="Email" aria-label="email input" name="email">
                                 </div>
                                 <div class="form-input pb-2">
-                                    <input class="form-control" type="number" placeholder="Pesel" aria-label="pesel input" name="pesel" maxlength="11">
+                                    <input class="form-control" type="number" placeholder="Pesel" aria-label="pesel input" name="pesel" maxlength="11" id="pesel">
                                 </div>
                                 <div class="form-input pb-2">
                                     <input class="form-control" type="password" placeholder="Password" aria-label="password input" name="password">
@@ -72,7 +77,19 @@
 </body>
 </html>
 
-<?php
+<script>
+// Limiting the number of input digits
+$('#pesel').keydown(function(e) {
+    if (this.value.length > 10) 
+        if ( !(e.which == '46' || e.which == '8' || e.which == '13') ) // backspace/enter/del
+            e.preventDefault();
+});
+</script>
+
+<?php 
+
+$errors = array(); // Initialize the errors array
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $login = $_POST['login'];
     $email = $_POST['email'];
@@ -80,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password1 = $_POST['password'];
     $password2 = $_POST['password_r'];
     $epassword = password_hash($password1, PASSWORD_DEFAULT);
-
-    if(isset($login) && isset($email) && isset($pesel) && isset($password1) && isset($password2)) {
+    // Validating input
+    if (isset($login) && isset($email) && isset($pesel) && isset($password1) && isset($password2)) {
         // Prepare statements for validation
         $login_stmt = $conn->prepare("SELECT * FROM users WHERE login = ?");
         $login_stmt->bind_param("s", $login);
@@ -98,20 +115,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $pesel_stmt->execute();
         $pesel_result = $pesel_stmt->get_result();
 
-        $errors = array();
-        if(count(array_filter($_POST)) != count($_POST)){
-            $errors[] = "Fill in all fields.";
+        // Validation checks...
+        
+        if (count(array_filter($_POST)) != count($_POST)) {
+            $errors[] = "• Fill in all fields";
         }
         // Other validation checks...
-
-        if(mysqli_num_rows($login_result) > 0) {
-            $errors[] = "This username already exists.";
-        }
-        if(mysqli_num_rows($email_result) > 0) {
-            $errors[] = "This email is already taken.";
-        }
-        if(mysqli_num_rows($pesel_result) <= 0) {
-            $errors[] = "Client with this pesel doesn't exist, consider pesel validation.";
+        else {
+            if (mysqli_num_rows($login_result) > 0) {
+                $errors[] = "• This username already exists";
+            }
+            if (strlen($login) < 3) {
+                $errors[] = "• Username has to be longer than 2 characters";
+            }
+            if (mysqli_num_rows($email_result) > 0) {
+                $errors[] = "• This email is already taken";
+            }
+            if (mysqli_num_rows($pesel_result) <= 0) {
+                $errors[] = "• Client with this pesel doesn't exist, consider pesel validation";
+            }
         }
         // Other validation checks...
 
@@ -132,15 +154,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt3->execute();
 
             header('Location: login.php');
+            exit(); // Make sure to exit after redirection
         }
-        // Other error handling...
-    }
-    else {
-        echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-        <strong>Fill in all fields</strong>.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>';
+        else {
+            echo '<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">';
+            echo '<strong>Error(s):</strong><br>';
+            foreach ($errors as $error) {
+                echo $error . '<br>';
+            }
+            echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+            echo '</div>';
+        }
     }
 }
-exit();
 ?>
+
+<script>
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    window.onload = function() {   
+        const darkMode = getCookie('darkmode') === 'true';
+        var element = document.body;
+        element.dataset.bsTheme = darkMode ? "dark" : "light";
+    };
+</script>
